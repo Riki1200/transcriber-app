@@ -1,44 +1,26 @@
 {
   "project_info": {
-    "project_number": "1061850765240",
-    "project_id": "kmp-starter-70c51",
-    "storage_bucket": "kmp-starter-70c51.firebasestorage.app"
+    "project_number": "558815437752",
+    "project_id": "transcriber-fast",
+    "storage_bucket": "transcriber-fast.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1061850765240:android:f69686e0a0eabfcfe7214d",
+        "mobilesdk_app_id": "1:558815437752:android:37e9dd3b1984ceecb2654d",
         "android_client_info": {
-          "package_name": "com.kmpstarter"
+          "package_name": "com.romeodev.transcriberFast"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "1061850765240-bhph55orrvk1jp4sc7lfml4tpp464oqn.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.kmpstarter",
-            "certificate_hash": "f585e2fa916d29fc7d320bd4d47e4b301fbde13b"
-          }
-        },
-        {
-          "client_id": "1061850765240-35h84f96u3jdbmk2sqgi9d1jp28jsfif.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAcwTQ9o8-lD2N47VMe1R0jragpM3PBays"
+          "current_key": "AIzaSyA_lJwakDzyrD8wwqU2ISld9ZkyjYPdfZk"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "1061850765240-35h84f96u3jdbmk2sqgi9d1jp28jsfif.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

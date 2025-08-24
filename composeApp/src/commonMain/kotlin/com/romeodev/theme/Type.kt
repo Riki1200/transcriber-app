@@ -4,10 +4,11 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import kmpstarter.composeapp.generated.resources.Res
-import kmpstarter.composeapp.generated.resources.poppins_regular
-import kmpstarter.composeapp.generated.resources.poppins_thin
+
 import org.jetbrains.compose.resources.Font
+import transcriberfast.composeapp.generated.resources.Res
+import transcriberfast.composeapp.generated.resources.poppins_regular
+import transcriberfast.composeapp.generated.resources.poppins_thin
 
 @Composable
 fun getPoppinsFontFamily() = FontFamily(

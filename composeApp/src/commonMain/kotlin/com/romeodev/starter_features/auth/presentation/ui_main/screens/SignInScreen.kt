@@ -50,21 +50,12 @@ import com.romeodev.starter_features.auth.presentation.ui_main.navigation.AuthSc
 import com.romeodev.starter_features.auth.presentation.viewmodels.AuthViewModel
 import com.romeodev.theme.Dimens
 import dev.gitlive.firebase.auth.FirebaseUser
-import kmpstarter.composeapp.generated.resources.Res
-import kmpstarter.composeapp.generated.resources.auth_email_label
-import kmpstarter.composeapp.generated.resources.auth_forgot_password
-import kmpstarter.composeapp.generated.resources.auth_hide_password
-import kmpstarter.composeapp.generated.resources.auth_no_account
-import kmpstarter.composeapp.generated.resources.auth_or
-import kmpstarter.composeapp.generated.resources.auth_password_label
-import kmpstarter.composeapp.generated.resources.auth_show_password
-import kmpstarter.composeapp.generated.resources.auth_sign_in
-import kmpstarter.composeapp.generated.resources.auth_sign_in_to_continue
-import kmpstarter.composeapp.generated.resources.auth_sign_up
-import kmpstarter.composeapp.generated.resources.auth_welcome_back
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import transcriberfast.composeapp.generated.resources.Res
+import transcriberfast.composeapp.generated.resources.*
+
 
 @Composable
 fun SignInScreen(

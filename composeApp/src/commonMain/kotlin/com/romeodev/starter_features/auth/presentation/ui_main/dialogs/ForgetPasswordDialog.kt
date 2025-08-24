@@ -37,14 +37,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.romeodev.theme.Dimens
-import kmpstarter.composeapp.generated.resources.Res
-import kmpstarter.composeapp.generated.resources.auth_cancel
-import kmpstarter.composeapp.generated.resources.auth_email_label
-import kmpstarter.composeapp.generated.resources.auth_forgot_password_desc
-import kmpstarter.composeapp.generated.resources.auth_forgot_password_title
-import kmpstarter.composeapp.generated.resources.auth_send_link
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
+import transcriberfast.composeapp.generated.resources.Res
+import transcriberfast.composeapp.generated.resources.auth_cancel
+import transcriberfast.composeapp.generated.resources.auth_email_label
+import transcriberfast.composeapp.generated.resources.auth_forgot_password_desc
+import transcriberfast.composeapp.generated.resources.auth_forgot_password_title
+import transcriberfast.composeapp.generated.resources.auth_send_link
 
 @Composable
 fun ForgetPasswordDialog(

@@ -3,9 +3,10 @@ package com.romeodev.core.ui.components.icons
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import kmpstarter.composeapp.generated.resources.Res
-import kmpstarter.composeapp.generated.resources.ic_google
+
 import org.jetbrains.compose.resources.painterResource
+import transcriberfast.composeapp.generated.resources.Res
+import transcriberfast.composeapp.generated.resources.ic_google
 
 
 @Composable

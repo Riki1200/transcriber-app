@@ -1,4 +1,4 @@
-rootProject.name = "KmpStarter"
+rootProject.name = "TranscriberFAST"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

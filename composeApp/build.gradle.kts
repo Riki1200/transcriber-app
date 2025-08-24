@@ -28,6 +28,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            freeCompilerArgs += listOf("-Xbinary=bundleId=com.romeodev.transciberapp")
             // Required when using NativeSQLiteDriver
             linkerOpts.add("-lsqlite3")
         }
@@ -162,7 +163,7 @@ android {
         buildFeatures {
             buildConfig = true
         }
-        applicationId = "com.kmpstarter"
+        applicationId = "com.romeodev"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
