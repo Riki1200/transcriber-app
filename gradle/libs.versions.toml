@@ -9,9 +9,9 @@ android-targetSdk = "36"
 # Kotlin Ecosystem
 calfFilePicker = "0.8.0"
 coilCompose = "3.2.0"
-kotlin = "2.2.0"
-kotlinx-datetime = "0.6.1"
-kotlinx-serialization-json = "1.7.3"
+kotlin = "2.2.10"
+kotlinx-datetime = "0.7.1"
+kotlinx-serialization-json = "1.9.0"
 coroutines = "1.10.2"
 
 # Compose & UI
@@ -27,7 +27,7 @@ kmpauth-google = "2.3.1"
 google-services = "4.4.3"
 
 # Networking
-ktor = "3.0.3"
+ktor = "3.2.3"
 
 # Dependency Injection
 koin = "4.1.0"
@@ -59,6 +59,9 @@ stately-common = "2.0.5"
 
 #Accompinist
 accompanist-system-ui-controller = "0.27.0"
+
+
+swift-klib = "0.6.4"
 
 [libraries]
 # Accompinist
@@ -151,3 +154,6 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 
 # Google Services Plugins
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+
+
+swift-klib = { id = "io.github.ttypic.swiftklib", version.ref = "swift-klib"}

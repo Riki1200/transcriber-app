@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.swift.klib)
 }
 
 kotlin {
@@ -28,9 +29,25 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
-            freeCompilerArgs += listOf("-Xbinary=bundleId=com.romeodev.transciberapp")
+            freeCompilerArgs += listOf("-Xbinary=bundleId=com.romeodev.transcriberFast")
             // Required when using NativeSQLiteDriver
             linkerOpts.add("-lsqlite3")
+        }
+
+
+        iosTarget.compilations {
+            val main by getting {
+                cinterops {
+                    create("IosTranscriber")
+                }
+            }
+        }
+    }
+
+    swiftklib {
+        create("IosTranscriber") {
+            path = file("../iosApp/iosApp/Transcriber")
+            packageName("com.romeodev.transcriberFast.Transcriber")
         }
     }
 
@@ -62,6 +79,11 @@ kotlin {
 
             // accompanist
             implementation(libs.accompanist.system.ui.controller)
+
+
+            implementation("androidx.media3:media3-transformer:1.8.0")
+            implementation("androidx.media3:media3-common:1.8.0")
+
 
         }
         commonMain.dependencies {
@@ -163,7 +185,7 @@ android {
         buildFeatures {
             buildConfig = true
         }
-        applicationId = "com.romeodev"
+        applicationId = "com.romeodev.transcriberFast"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

@@ -3,6 +3,7 @@ package com.romeodev.core.purchases.presentation.ui_main.navigation
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
+import com.romeodev.core.purchases.presentation.ui_main.screens.PurchaseSubscriptionScreen
 import com.romeodev.core.purchases.presentation.ui_main.screens.SamplePurchaseScreen
 import com.romeodev.core.ui.composition_locals.LocalNavController
 import com.romeodev.core.ui.utils.navigation.appNavComposable
@@ -24,14 +25,14 @@ fun NavGraphBuilder.purchasesNavGraph(
                 }
             )
 
-            /*PurchaseSubscriptionScreen(
-                modifier = scaffoldModifier,
-                features = listOf(),
-                subscriptionTerms = listOf(),
-                onDismiss = {
-                    navController.navigateUp()
-                }
-            )*/
+//            PurchaseSubscriptionScreen(
+//                modifier = scaffoldModifier,
+//                features = listOf(),
+//                subscriptionTerms = listOf(),
+//                onDismiss = {
+//                    navController.navigateUp()
+//                }
+//            )
         }
     }
 }
