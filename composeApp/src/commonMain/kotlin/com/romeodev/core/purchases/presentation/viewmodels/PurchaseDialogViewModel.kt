@@ -13,7 +13,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class PurchaseDialogViewModel(
     private val commonDataStore: CommonDataStore,
@@ -34,6 +35,7 @@ class PurchaseDialogViewModel(
         getDiscountExpirationStatus()
     }
 
+    @OptIn(ExperimentalTime::class)
     private fun getDiscountExpirationStatus() {
         getDiscountStatusJob?.cancel()
         getDiscountStatusJob = CoroutineScope(Dispatchers.IO).launch {

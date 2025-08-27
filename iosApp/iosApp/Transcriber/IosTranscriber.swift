@@ -51,6 +51,11 @@ import AVFoundation
 
     private func ensureAudioFile(url: URL) async throws -> URL {
         let asset = AVURLAsset(url: url)
+        
+       // let audioTracks = try await asset.loadTracks(withMediaType: AVMediaType.audio)
+       // let videoTracks = try await asset.loadTracks(withMediaType: AVMediaType.video)
+        
+        
         if asset.tracks(withMediaType: .audio).isEmpty { throw NSError(domain: "Speech", code: 3) }
 
         if asset.tracks(withMediaType: .video).isEmpty { return url }

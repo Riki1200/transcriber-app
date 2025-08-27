@@ -87,7 +87,7 @@ kotlin {
 
         }
         commonMain.dependencies {
-            // Compose Core UI
+            // Compose Core .
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -190,6 +190,9 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"")
+        buildConfigField("boolean", "ENABLE_LOGS", "true")
     }
     packaging {
         resources {
@@ -197,14 +200,22 @@ android {
         }
     }
     buildTypes {
+        debug {
+            buildConfigField("String", "API_BASE_URL", "\"https://staging.example.com/\"")
+            buildConfigField("boolean", "ENABLE_LOGS", "true")
+        }
+
         release {
             /*Todo set this to true in prod*/
-            isMinifyEnabled = false
-            isShrinkResources = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+
+            buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"")
+            buildConfigField("boolean", "ENABLE_LOGS", "false")
         }
     }
     compileOptions {
