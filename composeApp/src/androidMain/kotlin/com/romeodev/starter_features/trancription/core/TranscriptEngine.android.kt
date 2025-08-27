@@ -2,6 +2,7 @@ package com.romeodev.starter_features.trancription.core
 
 import android.content.Context
 import android.net.Uri
+import android.speech.SpeechRecognizer
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
@@ -70,6 +71,8 @@ actual class TranscriptEngine actual constructor(
             }
 
 
+            //SpeechRecognizer.createSpeechRecognizer(Context)
+
             val m4aFile = AudioExtract.extractToM4a(ctx, inputFile)
 
             val result = uploadToBackend(m4aFile)
@@ -95,7 +98,7 @@ actual class TranscriptEngine actual constructor(
     }
 }
 
-// Helpers (Android)
+
 private object FileExtractor {
     fun downloadToCache(ctx: Context, url: String): File {
         val tmp = File(ctx.cacheDir, "dl-${UUID.randomUUID()}")
@@ -115,10 +118,7 @@ private object FileExtractor {
     }
 }
 
-/**
- * Extrae solo audio (AAC) a .m4a desde un File (video o audio) usando Media3 Transformer.
- * Es asíncrono; se suspende hasta terminar (o fallar).
- */
+
 private object AudioExtract {
     @androidx.annotation.OptIn(UnstableApi::class)
     suspend fun extractToM4a(ctx: Context, input: File): File = withContext(Dispatchers.Default) {
