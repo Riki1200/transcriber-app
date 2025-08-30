@@ -28,3 +28,9 @@
 # @Serializable and @Polymorphic are used at runtime for polymorphic serialization.
 -keepattributes RuntimeVisibleAnnotations,AnnotationDefault
 
+
+-keep class com.romeodev.whisper.WhisperBridge { *; }
+-keepclasseswithmembers class com.romeodev.whisper.WhisperBridge {
+    native <methods>;
+}
+

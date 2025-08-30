@@ -54,6 +54,8 @@ kotlin {
     sourceSets {
 
         androidMain.dependencies {
+            implementation (project(":lib"))
+
             // Compose UI
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -181,6 +183,7 @@ android {
     namespace = "com.romeodev"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
+
     defaultConfig {
         buildFeatures {
             buildConfig = true
@@ -190,6 +193,10 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+
+        ndk {
+            abiFilters += listOf("arm64-v8a", "x86_64")
+        }
 
         buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"")
         buildConfigField("boolean", "ENABLE_LOGS", "true")

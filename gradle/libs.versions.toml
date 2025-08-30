@@ -1,6 +1,6 @@
 [versions]
 # Android Build Tools & SDK
-agp = "8.7.3"
+agp = "8.9.3"
 android-compileSdk = "36"
 android-minSdk = "24"
 #noinspection EditedTargetSdkVersion
@@ -62,6 +62,12 @@ accompanist-system-ui-controller = "0.27.0"
 
 
 swift-klib = "0.6.4"
+jetbrainsKotlinJvm = "2.2.10"
+coreKtx = "1.17.0"
+junit = "4.13.2"
+espressoCore = "3.7.0"
+appcompat = "1.7.1"
+material = "1.12.0"
 
 [libraries]
 # Accompinist
@@ -134,6 +140,11 @@ logging = { module = "org.lighthousegames:logging", version.ref = "logging" }
 atomic-fu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomic-fu" }
 stately-common = { module = "co.touchlab:stately-common", version.ref = "stately-common" }
 ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "compose-multiplatform" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 # Android Plugins
@@ -157,3 +168,5 @@ google-services = { id = "com.google.gms.google-services", version.ref = "google
 
 
 swift-klib = { id = "io.github.ttypic.swiftklib", version.ref = "swift-klib"}
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

@@ -37,3 +37,5 @@ expect class TranscriptEngine(config: TranscriptConfig = TranscriptConfig()) {
     /** Optional stream API for live mic or chunked uploads. */
     fun stream(): Flow<TranscriptChunk>
 }
+
+

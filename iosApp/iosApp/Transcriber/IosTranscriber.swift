@@ -11,15 +11,15 @@ import AVFoundation
 @objc public class IosTranscriber: NSObject {
     @objc public func transcribeFile(url: URL, languageHint: String?) async throws -> (String, String?) {
 
-       var hasError = false
         
-       SFSpeechRecognizer.requestAuthorization { authStatus in
-           hasError =  authStatus == .authorized
+        let authorized = await withCheckedContinuation { cont in
+            SFSpeechRecognizer.requestAuthorization { status in
+                cont.resume(returning: status == .authorized)
+            }
         }
         
-        if hasError {
-            throw NSError(domain: "Speech", code: 1)
-        }
+        guard authorized else { throw NSError(domain: "Speech", code: 1) }
+
       
 
 
