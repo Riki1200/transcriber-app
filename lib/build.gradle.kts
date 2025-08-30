@@ -29,7 +29,7 @@ android {
         externalNativeBuild {
             cmake {
 
-                arguments += listOf("-DGGML_HOME=${rootDir}/ggml")
+                arguments += listOf("-DGGML_HOME=${rootDir}/whisper.cpp/ggml")
 
                 if (
                     project.hasProperty("GGML_HOME") &&
