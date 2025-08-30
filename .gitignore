@@ -16,7 +16,7 @@ captures
 !*.xcodeproj/project.xcworkspace/
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
-composeApp/src/androidMain/assets/models
+composeApp/src/androidMain/assets/models/**.bin
 
 *.o
 *.a
