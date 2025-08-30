@@ -1,48 +1,56 @@
+# IntelliJ / Android Studio
 *.iml
-.kotlin
-.gradle
+.idea/
+.kotlin/
+.gradle/
+
+# Build outputs
 **/build/
-xcuserdata
 !src/**/build/
+build/
+build-*/
+build_*/
+
+# Android
 local.properties
-.idea
-.DS_Store
-captures
-.externalNativeBuild
-.cxx
+captures/
+.externalNativeBuild/
+.cxx/
+
+# iOS / Xcode
 *.xcodeproj/*
 !*.xcodeproj/project.pbxproj
 !*.xcodeproj/xcshareddata/
 !*.xcodeproj/project.xcworkspace/
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
-composeApp/src/androidMain/assets/models/**.bin
+xcuserdata/
 
+# OS / Editor
+.DS_Store
+.vscode/
+.vs/
+.vimspector.json
+
+# Models and heavy assets
+composeApp/src/androidMain/assets/models/**.bin
+ggml/
+models/*.mlmodel
+models/*.mlmodelc
+models/*.mlpackage
+models/*-encoder-openvino.xml
+models/*-encoder-openvino-cache/
+
+# whisper.cpp / native artifacts
 *.o
 *.a
 *.d
+*.exe
+*.log
 .cache/
 .coreml/
 .test/
 .venv/
-.vs/
-.vscode/
-
-.vimspector.json
-/CMakeSettings.json
-/talk-llama.dSYM/
-
-build/
-build-*/
-build_*/
-
-# SPM
-.build/
-.swiftpm
-*.metallib
-
-ggml-metal-embed.metal
-ggml-metal-embed.metal.tmp
 
 /main
 /stream
@@ -59,27 +67,26 @@ sync.sh
 libwhisper.a
 libwhisper.so
 compile_commands.json
+
+# CMake / CLion
+CMakeSettings.json
+cmake-build-debug/
+
+# Examples (whisper.cpp and extra)
 examples/
 examples/arm_neon.h
 examples/whisper.objc/whisper.objc.xcodeproj/xcshareddata
 examples/whisper.objc/whisper.objc.xcodeproj/xcuserdata/
 examples/whisper.objc/whisper.objc.xcodeproj/project.xcworkspace/xcuserdata
-
 extra/bench-gg.txt
 
-models/*.mlmodel
-models/*.mlmodelc
-models/*.mlpackage
-models/*-encoder-openvino.xml
-models/*-encoder-openvino-cache/
-bindings/java/.gradle/
-bindings/java/.idea/
-.idea/
+# SwiftPM
+.build/
+.swiftpm
+*.metallib
 
+# Misc
 benchmark_results.csv
-cmake-build-debug/
-.cxx/
-.gradle/
-
-.log
-.exe
+ggml-metal-embed.metal
+ggml-metal-embed.metal.tmp
+talk-llama.dSYM/

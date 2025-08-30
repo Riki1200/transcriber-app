@@ -1,147 +1,218 @@
-# 🚀 KMP Starter
+# Transcribily
 
-![KMP-Starter-Template](https://github.com/user-attachments/assets/bcf5bd62-9d5f-4d6c-9d2a-d8de6e76a3eb)
+**Transcribily** is a **Kotlin Multiplatform** app (Android + iOS) for **transcribing** and **live captioning** using **local Whisper** (no cloud upload). It supports input from **video**, **audio**, and **microphone**, and exposes a shared expect/actual engine for both platforms.
 
-A modern, production-ready **Kotlin Multiplatform** starter template with Material 3 design, utils, and clean architecture.
-
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.2.0-blue.svg)](https://kotlinlang.org)
-[![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.8.2-orange.svg)](https://www.jetbrains.com/lp/compose-multiplatform/)
-[![Material 3](https://img.shields.io/badge/Material%203-Latest-green.svg)](https://m3.material.io/)
-
-<div align="center">
-  <a href="https://buymeacoffee.com/devatrii" target="_blank">
-    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" width="150" />
-  </a>
-  <a href="https://www.youtube.com/@devatrii" target="_blank">
-    <img src="https://img.shields.io/badge/YouTube-DevAtrii-red?style=for-the-badge&logo=youtube&logoColor=white" alt="YouTube Channel" />
-  </a>
-</div>
-
-## ✨ Features
-
-### 🔐 **Authentication** ✅ 80% Complete
-- **Google Sign-In** - OAuth 2.0 authentication with Google
-- **Email/Password** - Traditional authentication system
-- **Password Reset** - Email-based password recovery
-- **Account Deletion** - Email-based account deletion
-
-### 🎨 **UI & Design**
-- **Material 3 Design System** - Modern, adaptive design with dark mode support
-- **Compose Multiplatform** - Shared UI across Android & iOS
-- **Custom Components** - Reusable UI components with iOS-inspired design
-- **Smooth Animations** - Spring animations and smooth transitions
-- **Theme Management** - Dynamic theme switching with persistence
-
-### 🏗️ **Architecture & DI**
-- **Koin Dependency Injection** - Clean architecture with proper DI
-- **MVVM+MVI Pattern** - ViewModels with StateFlow for reactive UI
-- **Repository Pattern** - Clean data layer separation
-- **Modular Structure** - Organized packages for scalability
-
-### 💾 **Data & Storage**
-- **Room Database** - Local data persistence with type-safe queries
-- **DataStore Preferences** - Key-value storage for settings
-- **Network Utilities** - Request state management and error handling
-- **Coroutines & Flow** - Asynchronous programming with reactive streams
-
-### 🎯 **Events & Navigation**
-- **Event System** - Centralized event management
-- **Snackbar Controller** - Global snackbar notifications
-- **Navigation** - Type-safe & Global navigation with transitions
-- **Theme Events** - Reactive theme management
-
-### 💰 **Monetization**
-- **RevenueCat Integration** - In-app purchases and subscriptions
-  - [📖 RevenueCat Setup Guide](docs/revenue-cat.md) - Complete implementation guide
-
-### 🛠️ **Utilities & Tools**
-- **Platform Detection** - Cross-platform utilities
-- **Logging System** - Structured logging across platforms
-- **Time Utilities** - timemillis handling
-- **Screen Size Detection** - Responsive design utilities
-
-## 📁 Project Structure
-
-```
-composeApp/src/commonMain/kotlin/com/kmpstarter/
-├── core/
-│   ├── ui/                    # UI Components & Screens
-│   │   ├── components/        # Reusable UI components
-│   │   ├── screens/          # Screen implementations
-│   │   ├── layouts/          # Custom layout components
-│   │   ├── modifiers/        # Custom modifiers
-│   │   ├── dialogs/          # Dialog components
-│   │   └── bottom_sheets/    # Bottom sheet components
-│   ├── events/               # Event Management
-│   │   ├── controllers/      # Event controllers
-│   │   ├── navigator/        # Navigation system
-│   │   └── utils/           # Event utilities
-│   ├── db/                  # Database Layer
-│   │   ├── di/             # Database DI modules
-│   │   └── *.kt            # Database entities & DAOs
-│   ├── di/                 # Dependency Injection
-│   │   ├── CoreModule.kt   # Core DI module
-│   │   └── InitKoin.kt     # Koin initialization
-│   ├── utils/              # Utilities
-│   │   ├── common/         # Common utilities
-│   │   ├── datastore/      # DataStore implementation
-│   │   ├── logging/        # Logging utilities
-│   │   ├── network_utils/  # Network utilities
-│   │   └── platform/       # Platform-specific utils
-│   ├── purchases/          # RevenueCat integration
-│   └── AppConstants.kt     # App constants
-├── starter_feaures/        # Completed features implemented by StarterTemplate i.e auth etc
-├── theme/                  # Material 3 theming
-└── App.kt                 # Main app entry point
-```
-
-## 🚀 Quick Start
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/DevAtrii/Kmp-Starter-Template.git
-   cd KMP-Starter-Template
-   ```
- 
-2. **Run the app**
-   ```bash
-   # Android
-   ./gradlew androidApp:assembleDebug
-   
-   # iOS
-   ./gradlew iosApp:assembleXCFramework
-   ```
- 
-
-## 📱 Supported Platforms
-
-- **Android** - API 24+ (Android 7.0+)
-- **iOS** - iOS 13.0+
-
-## 🛠️ Tech Stack
-
-- **Kotlin Multiplatform** - Cross-platform development
-- **Compose Multiplatform** - Shared UI framework
-- **Material 3** - Design system
-- **Koin** - Dependency injection
-- **Room** - Local database
-- **DataStore** - Preferences storage
-- **Coroutines & Flow** - Asynchronous programming
-- **RevenueCat** - In-app purchases
-- **Kotlinx Serialization** - JSON serialization
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+> Based on a KMP starter template, adapted to this repository's architecture, modules, and utilities.
 
 ---
 
-**Built by DevAtrii with ❤️ using Kotlin Multiplatform & Compose**
+## ✨ Features
+
+* **Local Whisper** via GGML / whisper.cpp (offline).
+* **Transcription of local files**: video (`.mp4`, `.mov`, …) and audio (`.m4a`, `.wav`, `.mp3`, …).
+* **Real‑time captions** from the microphone (on‑device).
+* **Audio extraction from video**: Android with **Media3 Transformer** (AAC `.m4a`), iOS with **AVAssetExportSession**.
+* **KMP architecture** with `expect/actual` for the transcription engine.
+* **Compose Multiplatform** shared UI; **Material 3**.
+* **Koin DI** and MVVM/MVI pattern.
+
+---
+
+## 🏗️ Project Structure
+
+```
+composeApp/
+  src/
+    commonMain/
+      kotlin/
+        com/transcribily/
+          core/
+          utils/
+          feature/transcription/
+            core/               # Common expect API + models
+            domain/             # Use cases
+            di/                 # Koin module
+          ui/
+            screens/transcription/  # VM + Compose screens
+    androidMain/
+      kotlin/
+        com/transcribily/feature/transcription/android/   # Android actual
+      res/
+      AndroidManifest.xml
+    iosMain/
+      kotlin/
+        com/transcribily/feature/transcription/ios/       # iOS actual (Kotlin)
+  build.gradle.kts
+
+iosApp/                        # Xcode project (if applicable)
+
+ggml/                          # GGML models (not committed by default)
+lib/                           # Native binaries/artifacts (if any)
+whisper.cpp/                   # Local native source (submodule/folder)
+```
+
+> If your template includes `starter_feaures/` (auth, etc.), keep it and add `feature/transcription` following the structure above.
+
+---
+
+## 🔧 Key Dependencies
+
+### Android
+
+* **Media3 Transformer** to extract audio from video (`.m4a`/AAC).
+* **AudioRecord** / AAudio (if you implement low‑latency mic) or capture with `AudioRecord` and feed Whisper.
+* **Kotlinx Coroutines** and **Koin**.
+
+### iOS
+
+* **AVFoundation** (audio extraction from video) and **Speech** (optional fallback; default path uses local Whisper).
+* **whisper.cpp** built for iOS (arm64 + simulator) as a **static lib** or **XCFramework**.
+
+---
+
+## 🔐 Permissions
+
+### Android (AndroidManifest.xml)
+
+* `RECORD_AUDIO` (for live captions).
+* File access depending on your picker flow (SAF / Storage Access Framework).
+
+### iOS (Info.plist)
+
+* `NSMicrophoneUsageDescription` (for live mic).
+* If only transcribing local files, mic is not required.
+
+---
+
+## 🚀 Quick Start
+
+### 1) Whisper Models (GGML)
+
+1. Download a model (e.g., `ggml-base.bin`) and place it under `ggml/`.
+2. Do not commit models due to size; prefer Git LFS or runtime download.
+
+### 2) whisper.cpp (native)
+
+* Include `whisper.cpp/` as a submodule or folder.
+* Build native libs:
+
+    * **Android**: CMake + NDK → produce `.so`/`aar` and link in `composeApp`.
+    * **iOS**: build a **static lib** or **XCFramework** (arm64 + simulator) and link in Xcode/Gradle.
+
+> You can start with a backend transcription and migrate to local; this repo is prepared for **local‑first**.
+
+### 3) Audio extraction from video
+
+* **Android**: use **Media3 Transformer** to export audio‑only `.m4a`.
+* **iOS**: use `AVAssetExportSession` with the `AppleM4A` preset.
+
+### 4) Build
+
+* **Android Studio**: open the project and run on a device/emulator.
+* **CLI** (depending on your template):
+
+    * Single‑module variant: `./gradlew :composeApp:assembleDebug`
+    * With a dedicated android module: `./gradlew :androidApp:assembleDebug`
+* **iOS**:
+
+    * Generate XCFramework if needed: `./gradlew :iosApp:assembleXCFramework`
+    * Or open `iosApp` in Xcode and run on device/simulator.
+
+---
+
+## 🧩 Shared API (KMP)
+
+```kotlin
+// commonMain
+sealed class TranscriptSource {
+    data class Url(val value: String): TranscriptSource()
+    data class Path(val value: String): TranscriptSource()
+    data class Bytes(val data: ByteArray, val mimeType: String = "audio/wav"): TranscriptSource()
+}
+
+data class TranscriptConfig(
+    val languageHint: String? = null,
+    val enableTimestamps: Boolean = false
+)
+
+data class TranscriptChunk(
+    val text: String,
+    val startSec: Double? = null,
+    val endSec: Double? = null
+)
+
+data class TranscriptResult(
+    val fullText: String,
+    val chunks: List<TranscriptChunk> = emptyList(),
+    val languageCode: String? = null
+)
+
+expect class TranscriptEngine(config: TranscriptConfig = TranscriptConfig()) {
+    suspend fun transcribeFile(source: TranscriptSource): TranscriptResult
+    fun stream(): kotlinx.coroutines.flow.Flow<TranscriptChunk>
+}
+```
+
+### Android (audio extractor with Media3)
+
+* Implement `actual` to convert video→`.m4a` and feed local Whisper (native) or your internal pipeline.
+* If you already have whisper.cpp bindings, call transcription directly on decoded PCM or the extracted audio.
+
+### iOS (Kotlin + whisper.cpp)
+
+* `actual` that:
+
+    1. If the input is a video, export audio `.m4a` with AVFoundation.
+    2. Decode to PCM and call local Whisper.
+
+---
+
+## 🖥️ Usage (example)
+
+```kotlin
+val engine = TranscriptEngine(TranscriptConfig(languageHint = "en-US"))
+
+// 1) Local file (video or audio)
+val result = engine.transcribeFile(TranscriptSource.Path("/sdcard/Movies/video.mp4"))
+println(result.fullText)
+
+// 2) Live captions (mic)
+engine.stream() // Flow<TranscriptChunk>
+// collect in your VM and render captions in the UI
+```
+
+---
+
+## 🧱 DI (Koin)
+
+```kotlin
+val transcriptionModule = module {
+    factory { (cfg: TranscriptConfig?) -> TranscriptEngine(cfg ?: TranscriptConfig()) }
+}
+```
+
+Register `transcriptionModule` along with your base modules from the template.
+
+---
+
+## 🧪 Status
+
+* [x] Shared expect/actual API
+* [x] Audio extraction (Android/iOS)
+* [x] Local Whisper integration (native bindings)
+* [ ] Word‑timestamps & diarization
+* [ ] Subtitle editing/export (SRT/VTT)
+
+---
+
+## 📄 License
+
+MIT
+
+---
+
+## 🙌 Credits
+
+* whisper.cpp (original license)
+* Jetpack Media3, AVFoundation
+* Kotlin Multiplatform & Compose
