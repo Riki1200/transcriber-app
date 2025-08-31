@@ -10,9 +10,17 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.Foundation.NSURL
 import kotlin.coroutines.resume
 import com.romeodev.transcriberFast.Transcriber.IosTranscriber
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.toKString
 import platform.Foundation.NSError
 import kotlin.coroutines.resumeWithException
+import whisper.*
 
+
+
+fun iosWhisperVersion(): String = memScoped {
+    whisper_version()?.toKString() ?: ""
+}
 
 actual class TranscriptEngine actual constructor(
     private val config: TranscriptConfig

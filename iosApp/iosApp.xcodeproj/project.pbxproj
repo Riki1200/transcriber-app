@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1334F00E2E648652003064BB /* whisper.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1334F00D2E648652003064BB /* whisper.xcframework */; };
+		1334F00F2E648652003064BB /* whisper.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1334F00D2E648652003064BB /* whisper.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3E38ACDA2E252CF1004805A2 /* PurchasesHybridCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 3E38ACD92E252CF1004805A2 /* PurchasesHybridCommon */; };
 		3E38ACDC2E252CF1004805A2 /* PurchasesHybridCommonUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3E38ACDB2E252CF1004805A2 /* PurchasesHybridCommonUI */; };
 		3E38ACDF2E252D36004805A2 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 3E38ACDE2E252D36004805A2 /* FirebaseAnalytics */; };
@@ -17,7 +19,22 @@
 		3E38ACEA2E252D73004805A2 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 3E38ACE92E252D73004805A2 /* GoogleSignInSwift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		1334F0102E648652003064BB /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				1334F00F2E648652003064BB /* whisper.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		1334F00D2E648652003064BB /* whisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = whisper.xcframework; path = "../whisper.cpp/build-apple/whisper.xcframework"; sourceTree = "<group>"; };
 		B9DA97B12DC1472C00A4DA20 /* Transcriber Fast.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Transcriber Fast.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -53,6 +70,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3E38ACDC2E252CF1004805A2 /* PurchasesHybridCommonUI in Frameworks */,
+				1334F00E2E648652003064BB /* whisper.xcframework in Frameworks */,
 				3E38ACE32E252D36004805A2 /* FirebaseCore in Frameworks */,
 				3E38ACDA2E252CF1004805A2 /* PurchasesHybridCommon in Frameworks */,
 				3E38ACEA2E252D73004805A2 /* GoogleSignInSwift in Frameworks */,
@@ -66,11 +84,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1334F00C2E648652003064BB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1334F00D2E648652003064BB /* whisper.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		B9DA97A82DC1472C00A4DA20 = {
 			isa = PBXGroup;
 			children = (
 				B9DA98002DC14AA900A4DA20 /* Configuration */,
 				B9DA97B32DC1472C00A4DA20 /* iosApp */,
+				1334F00C2E648652003064BB /* Frameworks */,
 				B9DA97B22DC1472C00A4DA20 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -94,6 +121,7 @@
 				B9DA97AD2DC1472C00A4DA20 /* Sources */,
 				B9DA97AE2DC1472C00A4DA20 /* Frameworks */,
 				B9DA97AF2DC1472C00A4DA20 /* Resources */,
+				1334F0102E648652003064BB /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

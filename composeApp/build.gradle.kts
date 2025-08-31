@@ -31,7 +31,9 @@ kotlin {
             isStatic = true
             freeCompilerArgs += listOf("-Xbinary=bundleId=com.romeodev.transcriberFast")
             // Required when using NativeSQLiteDriver
+            linkerOpts.add("-lc++")
             linkerOpts.add("-lsqlite3")
+
         }
 
 
@@ -40,6 +42,12 @@ kotlin {
                 cinterops {
                     create("IosTranscriber")
                 }
+            }
+        }
+
+        iosTarget.compilations.getByName("main").cinterops {
+            create("whisper") {
+                defFile(project.file("src/iosMain/c_interop/whisper.def"))
             }
         }
     }
