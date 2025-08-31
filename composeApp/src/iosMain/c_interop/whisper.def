@@ -1,14 +1,13 @@
-# Header principal
+
 headers = /Users/romeobetances/Desktop/Kmp-Starter-Template/whisper.cpp/include/whisper.h
 
-# Rutas de includes (IMPORTANTE: agrega ggml)
+
 compilerOpts = \
  -I/Users/romeobetances/Desktop/Kmp-Starter-Template/whisper.cpp/include \
  -I/Users/romeobetances/Desktop/Kmp-Starter-Template/whisper.cpp/ggml/include \
  -I/Users/romeobetances/Desktop/Kmp-Starter-Template/whisper.cpp/ggml/src \
  -I/Users/romeobetances/Desktop/Kmp-Starter-Template/whisper.cpp/ggml/src/ggml-cpu
 
-# (El linkeo se resuelve más tarde, pero si ya lo tienes puedes dejar:)
 linkerOpts = \
  -F/Users/romeobetances/Desktop/Kmp-Starter-Template/whisper.cpp/build-apple/whisper.xcframework/ios-arm64 \
  -F/Users/romeobetances/Desktop/Kmp-Starter-Template/whisper.cpp/build-apple/whisper.xcframework/ios-arm64_x86_64-simulator \
