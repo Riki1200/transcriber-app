@@ -8,6 +8,10 @@ compilerOpts = \
  -I/Users/romeobetances/Desktop/Kmp-Starter-Template/whisper.cpp/ggml/src \
  -I/Users/romeobetances/Desktop/Kmp-Starter-Template/whisper.cpp/ggml/src/ggml-cpu
 
+headerFilter = /Users/romeobetances/Desktop/Kmp-Starter-Template/whisper.cpp/include/** \
+               /Users/romeobetances/Desktop/Kmp-Starter-Template/whisper.cpp/ggml/include/** \
+               /Users/romeobetances/Desktop/Kmp-Starter-Template/whisper.cpp/ggml/src/**
+
 linkerOpts = \
  -F/Users/romeobetances/Desktop/Kmp-Starter-Template/whisper.cpp/build-apple/whisper.xcframework/ios-arm64 \
  -F/Users/romeobetances/Desktop/Kmp-Starter-Template/whisper.cpp/build-apple/whisper.xcframework/ios-arm64_x86_64-simulator \

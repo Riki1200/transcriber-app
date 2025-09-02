@@ -1,4 +1,4 @@
-package com.romeodev.media
+package com.romeodev.helpers.media
 
 import java.io.ByteArrayOutputStream
 import java.io.File

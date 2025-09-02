@@ -54,6 +54,10 @@
 			exceptions = (
 				B99700CA2DC9B8D800C7335B /* Exceptions for "iosApp" folder in "iosApp" target */,
 			);
+			explicitFolders = (
+				Resources/models,
+				Resources/samples,
+			);
 			path = iosApp;
 			sourceTree = "<group>";
 		};

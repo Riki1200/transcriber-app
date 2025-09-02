@@ -7,7 +7,7 @@ import java.io.File
 
 private const val LOG_TAG = "LibWhisper"
 
-internal class WhisperLib {
+class WhisperLib {
     companion object {
         init {
 

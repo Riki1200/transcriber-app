@@ -4,12 +4,13 @@ import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
-import com.romeodev.media.RiffWaveHelper
+import com.romeodev.helpers.media.RiffWaveHelper
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.lang.RuntimeException
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -69,7 +70,7 @@ private class AudioRecordThread(
                             allData.add(buffer[i])
                         }
                     } else {
-                        throw java.lang.RuntimeException("audioRecord.read returned $read")
+                        throw RuntimeException("audioRecord.read returned $read")
                     }
                 }
 
