@@ -15,5 +15,7 @@
 	</array>
 	<key>GIDClientID</key>
 	<string>1061850765240-jo8cgscsdv3pqq9ofbjdvsn8m82kc8jj.apps.googleusercontent.com</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>We need microphone for transcriber the audio file</string>
 </dict>
 </plist>

@@ -1,5 +1,8 @@
 package com.romeodev.core
 
+
+
+
 /**
  * This class is used to store the result of the transcription.
  * @param text the transcribed text.

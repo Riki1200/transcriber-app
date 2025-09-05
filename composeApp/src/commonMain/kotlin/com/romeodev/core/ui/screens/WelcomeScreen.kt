@@ -82,6 +82,7 @@ import com.romeodev.core.utils.platform.isDynamicColorSupported
 import com.romeodev.theme.Dimens
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 
 
@@ -353,6 +354,8 @@ fun WelcomeScreen(
         }
     }
 }
+
+
 
 @Composable
 private fun HeroSection(isCompact: Boolean) {

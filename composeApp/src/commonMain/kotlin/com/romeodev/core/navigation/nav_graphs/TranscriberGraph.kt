@@ -9,45 +9,18 @@ import com.romeodev.core.purchases.presentation.ui_main.navigation.PurchasesScre
 import com.romeodev.core.ui.composition_locals.LocalNavController
 import com.romeodev.core.ui.screens.WelcomeScreen
 import com.romeodev.core.ui.utils.navigation.appNavComposable
+import com.romeodev.features.trancription.presentation.ui.TranscribeScreen
 
-fun NavGraphBuilder.starterNavGraph(
+fun NavGraphBuilder.transcriberNavGraph(
     scaffoldModifier: Modifier,
 ) {
 
-    navigation<StarterScreens.Root>(
-        startDestination = StarterScreens.WelcomeScreen,
+    navigation<TranscriberScreens.Root>(
+        startDestination = TranscriberScreens.MainScreen,
     ) {
-        appNavComposable<StarterScreens.WelcomeScreen> {
+        appNavComposable<TranscriberScreens.MainScreen> {
             val navController = LocalNavController.current
-            WelcomeScreen(
-                modifier = scaffoldModifier,
-                onGetStartedClick = {
-                    // Example of navigating with nav controller without global nav events
-                    navController.navigate(
-                        route = TranscriberScreens.MainScreen
-                    )
-                }
-            )
+            TranscribeScreen()
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

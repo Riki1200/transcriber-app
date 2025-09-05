@@ -3,7 +3,7 @@ package com.romeodev.core.navigation.nav_graphs
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import com.romeodev.core.purchases.presentation.ui_main.navigation.purchasesNavGraph
-import com.romeodev.starter_features.auth.presentation.ui_main.navigation.authNavGraph
+import com.romeodev.features.auth.presentation.ui_main.navigation.authNavGraph
 
 fun NavGraphBuilder.appNavGraph(
     scaffoldModifier: Modifier,
@@ -18,4 +18,9 @@ fun NavGraphBuilder.appNavGraph(
         scaffoldModifier = scaffoldModifier
     )
     /*Todo add other nav graphs here*/
+
+    transcriberNavGraph(
+        scaffoldModifier = scaffoldModifier
+    )
+
 }
