@@ -31,7 +31,7 @@ class IosRecorder : Recorder {
 
     @OptIn(ExperimentalForeignApi::class)
     override suspend fun start(outputPath: String?) {
-        // 1) Permiso de micrófono
+
         val granted = suspendCoroutine<Boolean> { cont ->
             AVAudioSession.sharedInstance().requestRecordPermission { ok ->
                 cont.resume(ok)
@@ -39,7 +39,6 @@ class IosRecorder : Recorder {
         }
         require(granted) { "Se requiere permiso de micrófono en iOS" }
 
-        // 2) Configurar sesión
         val session = AVAudioSession.sharedInstance()
         memScoped {
             session.setCategory(

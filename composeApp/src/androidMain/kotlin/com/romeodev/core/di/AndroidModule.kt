@@ -1,7 +1,6 @@
 package com.romeodev.core.di
 
 import android.app.Application
-import android.content.Context
 import com.romeodev.core.WhisperEngine
 import com.romeodev.features.trancription.domain.models.Recorder
 import org.koin.android.ext.koin.androidContext
@@ -13,7 +12,7 @@ val androidCoreModule = module {
         val app = androidContext()
 
         val modelPath =  AndroidModelPathProvider(app)
-        WhisperEngine(modelPath = modelPath.getModelPath(), language = "en")
+        WhisperEngine(modelPath = modelPath.getModelPath(), language = "auto")
     }
     single<Recorder> { AndroidRecorder(androidContext() as Application) }
 }

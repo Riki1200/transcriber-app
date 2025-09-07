@@ -12,6 +12,7 @@ import com.romeodev.core.events.utils.ObserveAsEvents
 import com.romeodev.core.navigation.nav_graphs.appNavGraph
 import com.romeodev.core.navigation.screens.StarterScreens
 import com.romeodev.core.ui.composition_locals.LocalNavController
+import com.romeodev.features.trancription.presentation.viewModels.TranscribeViewModel
 import org.koin.compose.koinInject
 
 

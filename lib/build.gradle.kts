@@ -12,6 +12,7 @@ android {
     externalNativeBuild {
         cmake {
             path = File("src/main/jni/whisper/CMakeLists.txt")
+
         }
     }
     ndkVersion = "26.1.10909125"

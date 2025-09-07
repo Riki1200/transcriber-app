@@ -12,7 +12,7 @@ class AndroidModelPathProvider(
     override fun getModelPath(): String? {
         return AndroidModelCopier.ensureModel(
             context.applicationContext,
-            assetName = "models/ggml-tiny.en.bin"
+            assetName = "models/ggml-tiny.bin"
         )
     }
 }

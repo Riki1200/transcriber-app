@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 project(whisper_android)
 set(CMAKE_CXX_STANDARD 17)
 
-# CMAKE_SOURCE_DIR -> lib/src/main/jni/whisper
-# Sube hasta la raíz del repo:
 set(PROJECT_ROOT ${CMAKE_SOURCE_DIR}/../../../../../)
 
 set(WHISPER_ROOT ${PROJECT_ROOT}/whisper.cpp)
@@ -92,3 +90,5 @@ endif()
 
 # Target genérico
 build_library(whisper)
+
+

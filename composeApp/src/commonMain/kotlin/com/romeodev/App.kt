@@ -19,6 +19,7 @@ import com.romeodev.core.datastore.theme.ThemeDataStore
 import com.romeodev.core.events.controllers.SnackbarController
 import com.romeodev.core.events.utils.ObserveAsEvents
 import com.romeodev.core.navigation.ComposeNavigation
+import com.romeodev.features.trancription.presentation.viewModels.TranscribeViewModel
 import com.romeodev.theme.ApplicationTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -59,7 +60,7 @@ private fun MainApp(
             }
         ) { innerPaddings: PaddingValues ->
             ComposeNavigation(
-                scaffoldModifier = Modifier.padding(innerPaddings)
+                scaffoldModifier = Modifier.padding(innerPaddings),
             )
         }
     }

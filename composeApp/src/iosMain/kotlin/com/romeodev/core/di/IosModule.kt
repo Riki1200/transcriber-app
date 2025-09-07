@@ -8,10 +8,10 @@ import org.koin.dsl.module
 val iosCoreModule = module {
 
     single {
-        val modelPath = bundledWhisperModelPath(name = "ggml-tiny.en", ext = "bin")
+        val modelPath = bundledWhisperModelPath(name = "ggml-tiny", ext = "bin")
             ?: error("No se encontró el modelo en models/*.bin del bundle")
 
-        WhisperEngine(modelPath = modelPath, language = "en")
+        WhisperEngine(modelPath = modelPath, language = "auto")
     }
 
     // Recorder multiplataforma para iOS

@@ -10,6 +10,7 @@ import com.romeodev.core.ui.composition_locals.LocalNavController
 import com.romeodev.core.ui.screens.WelcomeScreen
 import com.romeodev.core.ui.utils.navigation.appNavComposable
 import com.romeodev.features.trancription.presentation.ui.TranscribeScreen
+import org.koin.compose.getKoin
 
 fun NavGraphBuilder.transcriberNavGraph(
     scaffoldModifier: Modifier,
@@ -20,7 +21,9 @@ fun NavGraphBuilder.transcriberNavGraph(
     ) {
         appNavComposable<TranscriberScreens.MainScreen> {
             val navController = LocalNavController.current
-            TranscribeScreen()
+            TranscribeScreen(
+                vm = getKoin().get()
+            )
         }
     }
 }

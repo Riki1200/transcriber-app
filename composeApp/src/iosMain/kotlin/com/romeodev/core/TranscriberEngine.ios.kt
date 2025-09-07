@@ -8,7 +8,7 @@ import cnames.structs.whisper_state
 import platform.UIKit.UIDevice;
 
 
-fun bundledWhisperModelPath(name: String = "ggml-tiny.en", ext: String = "bin"): String? {
+fun bundledWhisperModelPath(name: String = "ggml-tiny", ext: String = "bin"): String? {
     val url = NSBundle.mainBundle.URLForResource(name, ext, subdirectory = "models")
     return url?.path
 }

@@ -87,3 +87,117 @@ private fun headerBytes(totalLength: Int): ByteArray {
         return bytes
     }
 }
+
+
+private data class WavInfo(
+    val sampleRate: Int,
+    val channels: Int,
+    val bitsPerSample: Int,
+    val dataOffset: Int,
+    val dataSize: Int
+)
+
+private fun parseWavHeader(bytes: ByteArray): WavInfo {
+    fun le16(i: Int) = (bytes[i].toInt() and 0xFF) or ((bytes[i+1].toInt() and 0xFF) shl 8)
+    fun le32(i: Int) = (bytes[i].toInt() and 0xFF) or ((bytes[i+1].toInt() and 0xFF) shl 8) or
+            ((bytes[i+2].toInt() and 0xFF) shl 16) or ((bytes[i+3].toInt() and 0xFF) shl 24)
+
+    require(String(bytes, 0, 4) == "RIFF" && String(bytes, 8, 4) == "WAVE") { "WAV inválido" }
+
+    var p = 12
+    var fmtFound = false
+    var dataOffset = -1
+    var dataSize = -1
+    var audioFormat = 1 // PCM=1, FLOAT=3
+    var channels = 1
+    var sampleRate = 16000
+    var bitsPerSample = 16
+
+    while (p + 8 <= bytes.size) {
+        val id = String(bytes, p, 4)
+        val size = le32(p + 4)
+        val start = p + 8
+        if (id == "fmt ") {
+            audioFormat = le16(start + 0)
+            channels = le16(start + 2)
+            sampleRate = le32(start + 4)
+            bitsPerSample = le16(start + 14)
+            fmtFound = true
+        } else if (id == "data") {
+            dataOffset = start
+            dataSize = size
+        }
+        p = start + size
+        if (p % 2 == 1) p++ // alineación
+        if (fmtFound && dataOffset >= 0) break
+    }
+    require(fmtFound && dataOffset >= 0 && dataSize > 0) { "Chunks WAV no encontrados" }
+    return WavInfo(sampleRate, channels, bitsPerSample, dataOffset, dataSize)
+}
+
+ fun decodeWavToFloatsSmart(bytes: ByteArray, targetRate: Int = 16000): FloatArray {
+    val h = parseWavHeader(bytes)
+    val data = bytes.copyOfRange(h.dataOffset, h.dataOffset + h.dataSize)
+
+    // 1) Convertir a float mono [-1,1]
+    val mono: FloatArray = when (h.bitsPerSample) {
+        16 -> {
+            val totalSamples = data.size / 2
+            val ch = h.channels
+            val out = FloatArray(totalSamples / ch)
+            var j = 0
+            var i = 0
+            while (i + 1 < data.size) {
+                // leer int16 LE
+                val lo = data[i].toInt() and 0xFF
+                val hi = data[i + 1].toInt()
+                val s = (hi shl 8) or lo
+                val v = (s.toShort() / 32768.0f)
+                if (ch == 1) {
+                    out[j++] = v
+                } else {
+                    // si estéreo, promediar L y R
+                    val lo2 = data[i+2].toInt() and 0xFF
+                    val hi2 = data[i+3].toInt()
+                    val s2 = (hi2 shl 8) or lo2
+                    val v2 = (s2.toShort() / 32768.0f)
+                    out[j++] = 0.5f * (v + v2)
+                    i += 2 // consumo extra del segundo canal
+                }
+                i += 2
+            }
+            out
+        }
+        32 -> {
+            // 32-bit float WAV
+            val totalSamples = data.size / 4
+            val ch = h.channels
+            val out = FloatArray(totalSamples / ch)
+            var j = 0
+            var i = 0
+            val bb = java.nio.ByteBuffer.wrap(data).order(java.nio.ByteOrder.LITTLE_ENDIAN)
+            while (i < totalSamples) {
+                val v = bb.float
+                val v2 = if (ch > 1) bb.float else v
+                out[j++] = if (ch > 1) 0.5f * (v + v2) else v
+                i += ch
+            }
+            out
+        }
+        else -> error("Bits por muestra no soportados: ${h.bitsPerSample}")
+    }
+
+    // 2) Re-muestrear simple a 16 kHz si hace falta (linear)
+    if (h.sampleRate == targetRate) return mono
+    val ratio = targetRate.toDouble() / h.sampleRate
+    val outLen = (mono.size * ratio).toInt().coerceAtLeast(1)
+    val res = FloatArray(outLen)
+    for (i in 0 until outLen) {
+        val srcPos = i / ratio
+        val s0 = srcPos.toInt().coerceIn(0, mono.lastIndex)
+        val s1 = (s0 + 1).coerceIn(0, mono.lastIndex)
+        val t = (srcPos - s0)
+        res[i] = mono[s0] * (1 - t).toFloat() + mono[s1] * t.toFloat()
+    }
+    return res
+}

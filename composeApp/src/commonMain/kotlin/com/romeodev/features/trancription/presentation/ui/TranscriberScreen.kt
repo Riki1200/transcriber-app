@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -17,27 +16,35 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.romeodev.core.presentation.TranscribeViewModel
+import com.romeodev.core.TranscriptResult
+import com.romeodev.features.trancription.presentation.viewModels.TranscribeViewModel
 import org.koin.compose.getKoin
 @Composable
 fun TranscribeScreen(
-    vm: TranscribeViewModel = getKoin().get()
+    vm: TranscribeViewModel
 ) {
+
+    val transcription = vm.transcriber.collectAsState()
+
+
     TranscribeContent(
-        log = vm.log,
         onStartRecording = vm::startRecording,
-        onStopAndTranscribe = vm::stopAndTranscribe
+        onStopAndTranscribe = vm::stopAndTranscribe,
+        transcriber = transcription
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TranscribeContent(
-    log: String,
+
     onStartRecording: () -> Unit,
-    onStopAndTranscribe: () -> Unit
+    onStopAndTranscribe: () -> Unit,
+    transcriber: State<TranscriptResult?>
 ) {
     Scaffold(
         topBar = {
@@ -69,7 +76,7 @@ private fun TranscribeContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState()),
-                    text = log
+                    text = if(transcriber.value != null) transcriber.value!!.text else ""
                 )
             }
         }

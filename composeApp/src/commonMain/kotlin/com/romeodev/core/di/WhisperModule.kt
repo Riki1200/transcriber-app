@@ -8,7 +8,7 @@ fun whisperModule(defaultLanguage: String? = null) = module {
         val provider = get<ModelPathProvider>()
         WhisperEngine(
             modelPath = provider.getModelPath(),
-            language  = defaultLanguage
+            language  = defaultLanguage,
         )
     }
 }
