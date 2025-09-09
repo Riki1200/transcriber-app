@@ -2,25 +2,26 @@ package com.romeodev.core.di
 
 import com.romeodev.features.trancription.domain.models.Recorded
 import com.romeodev.features.trancription.domain.models.Recorder
-import kotlinx.cinterop.CPointer
-import platform.Foundation.*
-import platform.Foundation.NSSearchPathForDirectoriesInDomains
-import platform.Foundation.NSURL
-
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.ObjCObjectVar
-import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.ptr
+import platform.AVFAudio.AVAudioRecorder
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
-import platform.AVFAudio.*
-import platform.AVFAudio.AVAudioRecorder
-import platform.AVFAudio.*
-import platform.AVFoundation.*
-import platform.CoreAudioTypes.*
-import platform.darwin.*
-import kotlin.coroutines.*
+import platform.AVFAudio.AVFormatIDKey
+import platform.AVFAudio.AVLinearPCMBitDepthKey
+import platform.AVFAudio.AVLinearPCMIsBigEndianKey
+import platform.AVFAudio.AVLinearPCMIsFloatKey
+import platform.AVFAudio.AVLinearPCMIsNonInterleaved
+import platform.AVFAudio.AVNumberOfChannelsKey
+import platform.AVFAudio.AVSampleRateKey
+import platform.AVFAudio.setActive
+import platform.CoreAudioTypes.kAudioFormatLinearPCM
+import platform.Foundation.NSDocumentDirectory
+import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSURL
+import platform.Foundation.NSUserDomainMask
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 
 @OptIn(ExperimentalForeignApi::class)

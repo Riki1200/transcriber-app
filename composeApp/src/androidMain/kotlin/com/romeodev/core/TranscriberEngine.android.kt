@@ -9,6 +9,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class WhisperEngine actual constructor(
     modelPath: String?,
     private val language: String?
