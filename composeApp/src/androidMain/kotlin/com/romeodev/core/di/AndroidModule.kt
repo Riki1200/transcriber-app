@@ -17,9 +17,3 @@ val androidCoreModule = module {
     single<Recorder> { AndroidRecorder(androidContext() as Application) }
 }
 
-
-//val androidModule = module {
-//    single<Recorder> { AndroidRecorder(androidContext() as Application) }
-//
-//    single<ModelPathProvider> { AndroidModelPathProvider(androidContext()) }
-//}

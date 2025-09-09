@@ -1,11 +1,6 @@
 package com.romeodev.core
 
-
-import android.content.Context
-import android.content.res.AssetManager
-import com.romeodev.MyApplication
 import com.romeodev.helpers.media.decodeWavToFloatsSmart
-import com.romeodev.lib.NativeWhisper
 import com.romeodev.lib.WhisperContext
 
 
@@ -15,7 +10,7 @@ import java.io.File
 
 
 actual class WhisperEngine actual constructor(
-    private val modelPath: String?,
+    modelPath: String?,
     private val language: String?
 ) {
     private var ctx: WhisperContext? = null

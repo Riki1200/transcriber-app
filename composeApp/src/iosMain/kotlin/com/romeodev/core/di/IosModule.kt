@@ -14,12 +14,7 @@ val iosCoreModule = module {
         WhisperEngine(modelPath = modelPath, language = "auto")
     }
 
-    // Recorder multiplataforma para iOS
-    single<Recorder> { IosRecorder() } // tu implementación expect/actual de Recorder en iOS
+
+    single<Recorder> { IosRecorder() }
 }
 
-
-
-//val iosModule = module {
-//    single<ModelPathProvider> { IosModelPathProvider() }
-//}

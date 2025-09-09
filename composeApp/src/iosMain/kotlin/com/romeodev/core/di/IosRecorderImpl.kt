@@ -32,7 +32,7 @@ class IosRecorder : Recorder {
     @OptIn(ExperimentalForeignApi::class)
     override suspend fun start(outputPath: String?) {
 
-        val granted = suspendCoroutine<Boolean> { cont ->
+        val granted = suspendCoroutine { cont ->
             AVAudioSession.sharedInstance().requestRecordPermission { ok ->
                 cont.resume(ok)
             }
