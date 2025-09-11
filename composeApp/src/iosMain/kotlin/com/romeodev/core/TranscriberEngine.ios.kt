@@ -3,9 +3,26 @@ package com.romeodev.core
 import kotlinx.cinterop.*
 import platform.Foundation.*
 import whisper.*
+
+
 import cnames.structs.whisper_context
 import cnames.structs.whisper_state
+import com.romeodev.decodeWavToFloats
+import platform.AVFAudio.AVAudioCommonFormat
+import kotlinx.cinterop.memScoped
+import platform.AVFAudio.*
+import platform.AVFAudio.AVAudioConverter
+import platform.AVFAudio.AVAudioConverterInputBlock
+import platform.AVFAudio.AVAudioConverterInputStatus_HaveData
+import platform.AVFAudio.AVAudioEngine
+import platform.AVFAudio.AVAudioFormat
+import platform.AVFAudio.AVAudioPCMBuffer
+import platform.AVFAudio.AVAudioSession
+import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
+import platform.AVFAudio.AVAudioSessionModeMeasurement
+import platform.AVFAudio.setActive
 import platform.UIKit.UIDevice;
+import kotlin.concurrent.Volatile
 
 
 fun bundledWhisperModelPath(name: String = "ggml-tiny", ext: String = "bin"): String? {
@@ -61,7 +78,10 @@ actual class WhisperEngine actual constructor(
             p.print_progress = false
             p.print_timestamps = true
             p.print_special = false
-            p.translate = false
+            p.translate = true
+            p.detect_language = true
+
+
             language?.let { lang ->
                 lang.cstr.getPointer(this).let { p.language = it }
             }
@@ -80,7 +100,7 @@ actual class WhisperEngine actual constructor(
         for (i in 0 until n) {
             sb.append(whisper_full_get_segment_text(c, i)!!.toKString())
         }
-        NSLog("Segmentos: ${sb.toString()}")
+
         return TranscriptResult(text = sb.toString(), language = language)
     }
 
@@ -89,143 +109,188 @@ actual class WhisperEngine actual constructor(
         ctx = null
     }
 
-//    private fun decodeWavToFloats(path: String): FloatArray {
-//        val data = NSData.dataWithContentsOfFile(path)!!
-//        val total = data.length.toInt()
-//        val shortCount = (total - 44) / 2
-//        val out = FloatArray(shortCount)
-//        val raw = data.bytes?.reinterpret<ShortVar>()
-//        for (i in 0 until shortCount) {
-//            val s = raw?.get(i + 22) ?: 0
-//            if(s == 0.toShort()) {
-//                return  FloatArray(shortCount)
-//            }
-//            out[i] = (s / 32767.0f).coerceIn(-1f, 1f)
-//        }
-//        return out
-//    }
 
-    private fun decodeWavToFloats(path: String): FloatArray {
-        val data = NSData.dataWithContentsOfFile(path)
-            ?: error("No se pudo leer el archivo: $path")
-        val total = data.length.toInt()
-        require(total >= 44) { "WAV demasiado corto" }
-
-        fun u8(off: Int) = data.bytes!!.reinterpret<ByteVar>()[off].toInt() and 0xFF
-        fun le16(off: Int): Int = u8(off) or (u8(off + 1) shl 8)
-        fun le32(off: Int): Int = u8(off) or (u8(off + 1) shl 8) or (u8(off + 2) shl 16) or (u8(off + 3) shl 24)
-
-        // RIFF/WAVE
-        require(('R'.code == u8(0) && 'I'.code == u8(1) && 'F'.code == u8(2) && 'F'.code == u8(3))) { "No es RIFF" }
-        require(('W'.code == u8(8) && 'A'.code == u8(9) && 'V'.code == u8(10) && 'E'.code == u8(11))) { "No es WAVE" }
-
-        // busca fmt  y data
-        var off = 12
-        var fmtFound = false
-        var dataFound = false
-        var audioFormat = 1
-        var numChannels = 1
-        var sampleRate = 16000
-        var bitsPerSample = 16
-        var dataOffset = -1
-        var dataSize = -1
-
-        while (off + 8 <= total) {
-            val id = charArrayOf(u8(off).toChar(), u8(off+1).toChar(), u8(off+2).toChar(), u8(off+3).toChar()).concatToString()
-            val size = le32(off + 4)
-            val next = off + 8 + size
-            if (next > total) break
-            when (id) {
-                "fmt " -> {
-                    fmtFound = true
-                    audioFormat = le16(off + 8)           // 1=PCM16, 3=Float32
-                    numChannels = le16(off + 10)          // 1/2
-                    sampleRate = le32(off + 12)
-                    bitsPerSample = le16(off + 22)
-                }
-                "data" -> {
-                    dataFound = true
-                    dataOffset = off + 8
-                    dataSize = size
-                }
+    private class IOSStreamHandle(
+        private val stopImpl: () -> Unit
+    ) : StreamHandle {
+        @Volatile
+        private var active = true
+        override fun stop() {
+            if (active) {
+                active = false; stopImpl()
             }
-            off = next + (size % 2) // padding si odd
         }
 
-        require(fmtFound) { "WAV sin chunk fmt " }
-        require(dataFound) { "WAV sin chunk data" }
-        require(numChannels in 1..2) { "Canales no soportados: $numChannels" }
-
-        val floatsMono: FloatArray = when (audioFormat) {
-            1 -> { // PCM16
-                require(bitsPerSample == 16) { "Solo PCM16 soportado (bits=$bitsPerSample)" }
-                val bytesPerFrame = 2 * numChannels
-                val nFrames = dataSize / bytesPerFrame
-                val out = FloatArray(nFrames)
-                var p = dataOffset
-                for (i in 0 until nFrames) {
-                    if (numChannels == 1) {
-                        val s = (le16(p).toShort()).toFloat() / 32768f
-                        out[i] = s.coerceIn(-1f, 1f)
-                        p += 2
-                    } else {
-                        val l = (le16(p).toShort()).toFloat() / 32768f
-                        val r = (le16(p + 2).toShort()).toFloat() / 32768f
-                        out[i] = ((l + r) * 0.5f).coerceIn(-1f, 1f)
-                        p += 4
-                    }
-                }
-                out
-            }
-            3 -> { // Float32
-                require(bitsPerSample == 32) { "Float32 esperado (bits=$bitsPerSample)" }
-                fun f32(o: Int): Float {
-                    val b0 = u8(o)
-                    val b1 = u8(o + 1)
-                    val b2 = u8(o + 2)
-                    val b3 = u8(o + 3)
-                    val intBits = b0 or (b1 shl 8) or (b2 shl 16) or (b3 shl 24)
-                    return Float.fromBits(intBits) // ✅ disponible en Kotlin/Native
-                }
-                val bytesPerFrame = 4 * numChannels
-                val nFrames = dataSize / bytesPerFrame
-                val out = FloatArray(nFrames)
-                var p = dataOffset
-                for (i in 0 until nFrames) {
-                    if (numChannels == 1) {
-                        out[i] = f32(p).coerceIn(-1f, 1f)
-                        p += 4
-                    } else {
-                        val l = f32(p)
-                        val r = f32(p + 4)
-                        out[i] = ((l + r) * 0.5f).coerceIn(-1f, 1f)
-                        p += 8
-                    }
-                }
-                out
-            }
-            else -> error("Formato WAV no soportado (audioFormat=$audioFormat)")
-        }
-
-        // resample simple a 16k si hace falta
-        return if (sampleRate == 16000) floatsMono else resampleLinear(floatsMono, sampleRate, 16000)
+        override val isActive: Boolean get() = active
     }
 
-    private fun resampleLinear(input: FloatArray, srcRate: Int, dstRate: Int): FloatArray {
-        if (input.isEmpty()) return input
-        val ratio = dstRate.toDouble() / srcRate.toDouble()
-        val outLen = kotlin.math.max(1, (input.size * ratio).toInt())
-        val out = FloatArray(outLen)
-        for (i in 0 until outLen) {
-            val srcPos = i / ratio
-            val i0 = srcPos.toInt().coerceIn(0, input.lastIndex)
-            val i1 = (i0 + 1).coerceAtMost(input.lastIndex)
-            val t = (srcPos - i0)
-            out[i] = (input[i0] * (1 - t) + input[i1] * t).toFloat()
-        }
-        return out
-    }
+    actual fun startStreaming(
+        config: StreamConfig,
+        onPartial: (TranscriptResult) -> Unit
+    ): StreamHandle {
+        val c = requireNotNull(ctx) { "WhisperEngine cerrado" }
 
+        // 1) Sesión + engine
+        val session = AVAudioSession.sharedInstance()
+        session.setCategory(AVAudioSessionCategoryPlayAndRecord, error = null)
+        session.setMode(AVAudioSessionModeMeasurement, error = null)
+        session.setActive(true, error = null)
+
+        val engine = AVAudioEngine()
+        val inputNode = engine.inputNode
+        val hwFormat = inputNode.inputFormatForBus(0u)
+
+        // 2) Destino 16 kHz mono Float32 (¡ojo con el enum!)
+        val outFormat = AVAudioFormat(
+            commonFormat = AVAudioPCMFormatFloat32,
+            sampleRate = config.sampleRate.toDouble(),
+            channels = 1u,
+            interleaved = false
+        )!!
+
+        val converter = AVAudioConverter(fromFormat = hwFormat, toFormat = outFormat)
+
+        // 3) Estado whisper + buffers (modo “igual que Obj-C”: acumulamos y procesamos todo)
+        val state: CPointer<whisper_state> = whisper_init_state(c)
+            ?: error("No se pudo crear whisper_state")
+
+        // Máximo audio acumulado (como el ejemplo: algunos segundos; aquí 30 s máx)
+        val maxSeconds = 30
+        val maxSamples = maxSeconds * config.sampleRate
+        val ring = FloatArray(maxSamples)
+        var w = 0               // índice de escritura
+        var total = 0           // cuántos samples válidos acumulados (<= maxSamples)
+
+        fun pushPcm(pcm: FloatArray) {
+            for (x in pcm) {
+                ring[w] = x
+                w = (w + 1) % ring.size
+                if (total < ring.size) total++
+            }
+        }
+
+
+        inputNode.installTapOnBus(0u, 1024u, hwFormat) { buffer, _ ->
+
+
+            val outBuf = AVAudioPCMBuffer(outFormat, 8192u)
+            outBuf.frameLength = 8192u
+
+
+            val inputBlock: AVAudioConverterInputBlock = { inNumPackets, outStatus ->
+                // Limita el tamaño del buffer al solicitado
+                val requested = inNumPackets.toInt()
+
+                if (buffer != null) {
+                    if (requested > 0 && buffer.frameLength.toInt() > requested) {
+                        buffer.frameLength = requested.toUInt()
+                    }
+                }
+
+                outStatus?.let { it[0] = AVAudioConverterInputStatus_HaveData }
+
+                buffer
+            }
+
+            memScoped {
+                val err = nativeHeap.alloc<ObjCObjectVar<NSError?>>()
+                converter.convertToBuffer(outBuf, error = err.ptr, withInputFromBlock = inputBlock)
+                if (err.value != null) {
+                    return@installTapOnBus
+                }
+            }
+
+            val ch0 = outBuf.floatChannelData!![0]!!
+            val frames = outBuf.frameLength.toInt()
+            val arr = FloatArray(frames)
+            for (i in 0 until frames) arr[i] = ch0[i]
+            pushPcm(arr)
+        }
+
+        engine.prepare()
+        engine.startAndReturnError(null)
+
+        // 5) Timer “realtime” al estilo Obj-C: ejecuta whisper_full con parámetros equivalentes
+        val timer = NSTimer.scheduledTimerWithTimeInterval(
+            config.intervalMs.toDouble() / 1000.0,
+            repeats = true
+        ) { _ ->
+            if (total <= 0) return@scheduledTimerWithTimeInterval
+
+            // Copiamos TODO lo acumulado (como el sample Obj-C) o limita a windowSeconds si quieres
+            val take = if (config.windowSeconds > 0)
+                minOf(total, config.windowSeconds * config.sampleRate)
+            else total
+
+            val samples = FloatArray(take)
+            // leer desde w - take (ring buffer)
+            var idx = (w - take + ring.size) % ring.size
+            for (i in 0 until take) {
+                samples[i] = ring[idx]; idx = (idx + 1) % ring.size
+            }
+
+            memScoped {
+                val params =
+                    whisper_full_default_params(whisper_sampling_strategy.WHISPER_SAMPLING_GREEDY)
+                val p = params.ptr.pointed
+
+
+                p.print_realtime = true
+                p.print_progress = false
+                p.print_timestamps = true
+                p.print_special = false
+                p.translate = false
+
+                // Idioma: fijo si viene en config o en el ctor; si no, detectar
+                val lang = config.language ?: language
+                if (!lang.isNullOrEmpty()) {
+                    lang.cstr.getPointer(this).let { p.language = it }
+                    p.detect_language = false
+                } else {
+                    p.detect_language = true
+                }
+
+                val maxThreads =
+                    maxOf(1, (platform.posix.sysconf(platform.posix._SC_NPROCESSORS_ONLN)).toInt())
+                p.n_threads = maxThreads
+                p.offset_ms = 0
+                p.no_context = true              // como en el sample Obj-C
+                p.single_segment = true              // “modo realtime”
+                p.no_timestamps = p.single_segment  // igual que Obj-C
+
+                whisper_reset_timings(c)
+
+                samples.usePinned { buf ->
+                    val rc =
+                        whisper_full_with_state(c, state, params, buf.addressOf(0), samples.size)
+                    if (rc != 0) return@usePinned
+                }
+
+                // Construimos el texto resultante (todo o lo nuevo)
+                val nSeg = whisper_full_n_segments(c)
+                if (nSeg > 0) {
+                    val sb = StringBuilder()
+                    for (i in 0 until nSeg) {
+                        val seg = whisper_full_get_segment_text(c, i)?.toKString() ?: ""
+                        sb.append(seg)
+                    }
+                    val text = sb.toString().trim()
+                    if (text.isNotEmpty()) {
+                        onPartial(TranscriptResult(text = text, language = lang))
+                    }
+                }
+            }
+        }
+
+        // 6) Devolver handle que limpia todo al parar
+        return IOSStreamHandle {
+            timer.invalidate()
+            engine.inputNode.removeTapOnBus(0u)
+            engine.stop()
+            session.setActive(false, error = null)
+            whisper_free_state(state)
+        }
+    }
 
 
 }

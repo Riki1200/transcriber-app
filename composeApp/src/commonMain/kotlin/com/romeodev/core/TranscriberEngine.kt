@@ -35,6 +35,23 @@ sealed class AudioSource {
     }
 }
 
+
+/** Streaming configuration */
+data class StreamConfig(
+    val sampleRate: Int = 16_000, // target SR
+    val windowSeconds: Int = 10, // analysis window for each tick
+    val intervalMs: Long = 500, // how often to push partials
+    val detectLanguageOnce: Boolean = true,
+    val language: String? = null // if set, disables detection
+)
+
+
+/** Handle to control a streaming session */
+interface StreamHandle {
+    fun stop()
+    val isActive: Boolean
+}
+
 /**
  * This class is used to transcribe audio files to text.
  * The constructor takes two parameters:
@@ -54,6 +71,13 @@ expect class WhisperEngine {
      */
 
     suspend fun transcribe(source: AudioSource): TranscriptResult
+
+    // NEW — start platform streaming and emit partials via callback.
+// Returns a handle so caller can stop().
+    fun startStreaming(
+        config: StreamConfig = StreamConfig(),
+        onPartial: (TranscriptResult) -> Unit
+    ): StreamHandle
 
     /**
      * Closes the engine.
