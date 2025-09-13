@@ -8,8 +8,15 @@ import whisper.*
 import cnames.structs.whisper_context
 import cnames.structs.whisper_state
 import com.romeodev.decodeWavToFloats
+import kotlinx.atomicfu.atomic
 import platform.AVFAudio.AVAudioCommonFormat
 import kotlinx.cinterop.memScoped
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import platform.AVFAudio.*
 import platform.AVFAudio.AVAudioConverter
 import platform.AVFAudio.AVAudioConverterInputBlock
@@ -21,8 +28,14 @@ import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
 import platform.AVFAudio.AVAudioSessionModeMeasurement
 import platform.AVFAudio.setActive
+import platform.QuartzCore.CACurrentMediaTime
 import platform.UIKit.UIDevice;
+import platform.darwin.DISPATCH_QUEUE_PRIORITY_DEFAULT
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_global_queue
+import platform.darwin.dispatch_get_main_queue
 import kotlin.concurrent.Volatile
+import kotlin.coroutines.cancellation.CancellationException
 
 
 fun bundledWhisperModelPath(name: String = "ggml-tiny", ext: String = "bin"): String? {
@@ -124,13 +137,31 @@ actual class WhisperEngine actual constructor(
         override val isActive: Boolean get() = active
     }
 
+    private fun buildDefaultParams(mem: MemScope, configureCallback: (whisper_full_params) -> Unit = {}): CPointer<whisper_full_params> {
+        val params =
+            whisper_full_default_params(whisper_sampling_strategy.WHISPER_SAMPLING_GREEDY)
+
+        var pointer: CPointer<whisper_full_params>
+
+
+        memScoped {
+            val p = params.ptr.pointed
+            configureCallback(p)
+            pointer = params.ptr
+        }
+
+        return pointer
+    }
+
+
+
     actual fun startStreaming(
         config: StreamConfig,
         onPartial: (TranscriptResult) -> Unit
     ): StreamHandle {
         val c = requireNotNull(ctx) { "WhisperEngine cerrado" }
 
-        // 1) Sesión + engine
+        // Session + engine (igual)
         val session = AVAudioSession.sharedInstance()
         session.setCategory(AVAudioSessionCategoryPlayAndRecord, error = null)
         session.setMode(AVAudioSessionModeMeasurement, error = null)
@@ -140,26 +171,22 @@ actual class WhisperEngine actual constructor(
         val inputNode = engine.inputNode
         val hwFormat = inputNode.inputFormatForBus(0u)
 
-        // 2) Destino 16 kHz mono Float32 (¡ojo con el enum!)
         val outFormat = AVAudioFormat(
             commonFormat = AVAudioPCMFormatFloat32,
             sampleRate = config.sampleRate.toDouble(),
             channels = 1u,
             interleaved = false
-        )!!
+        )
 
         val converter = AVAudioConverter(fromFormat = hwFormat, toFormat = outFormat)
 
-        // 3) Estado whisper + buffers (modo “igual que Obj-C”: acumulamos y procesamos todo)
-        val state: CPointer<whisper_state> = whisper_init_state(c)
-            ?: error("No se pudo crear whisper_state")
+        val state = whisper_init_state(c) ?: error("No se pudo crear whisper_state")
 
-        // Máximo audio acumulado (como el ejemplo: algunos segundos; aquí 30 s máx)
-        val maxSeconds = 30
-        val maxSamples = maxSeconds * config.sampleRate
+
+        val maxSamples = 30 * config.sampleRate
         val ring = FloatArray(maxSamples)
-        var w = 0               // índice de escritura
-        var total = 0           // cuántos samples válidos acumulados (<= maxSamples)
+         var w = 0
+        var total = 0
 
         fun pushPcm(pcm: FloatArray) {
             for (x in pcm) {
@@ -171,125 +198,126 @@ actual class WhisperEngine actual constructor(
 
 
         inputNode.installTapOnBus(0u, 1024u, hwFormat) { buffer, _ ->
+            try {
+                if (buffer == null) return@installTapOnBus
 
+                val outBuf = AVAudioPCMBuffer(outFormat, buffer.frameCapacity)!!
 
-            val outBuf = AVAudioPCMBuffer(outFormat, 8192u)
-            outBuf.frameLength = 8192u
+                val inputBlock: AVAudioConverterInputBlock = { inNumPackets, outStatus ->
+                    outStatus?.pointed?.value = AVAudioConverterInputStatus_HaveData
+                    buffer
+                }
+                memScoped {
+                    val err = nativeHeap.alloc<ObjCObjectVar<NSError?>>()
+                    val rc = converter.convertToBuffer(outBuf, error = err.ptr, withInputFromBlock = inputBlock)
+                    if (err.value != null) {
 
-
-            val inputBlock: AVAudioConverterInputBlock = { inNumPackets, outStatus ->
-                // Limita el tamaño del buffer al solicitado
-                val requested = inNumPackets.toInt()
-
-                if (buffer != null) {
-                    if (requested > 0 && buffer.frameLength.toInt() > requested) {
-                        buffer.frameLength = requested.toUInt()
+                        return@installTapOnBus
+                    }
+                    val frames = outBuf.frameLength.toInt()
+                    val src = outBuf.floatChannelData?.get(0)
+                    if (src != null) {
+                        val arr = FloatArray(frames)
+                        for (i in 0 until frames) arr[i] = src[i]
+                        pushPcm(arr)
                     }
                 }
-
-                outStatus?.let { it[0] = AVAudioConverterInputStatus_HaveData }
-
-                buffer
+            } catch (t: Throwable) {
+                t.printStackTrace()
             }
-
-            memScoped {
-                val err = nativeHeap.alloc<ObjCObjectVar<NSError?>>()
-                converter.convertToBuffer(outBuf, error = err.ptr, withInputFromBlock = inputBlock)
-                if (err.value != null) {
-                    return@installTapOnBus
-                }
-            }
-
-            val ch0 = outBuf.floatChannelData!![0]!!
-            val frames = outBuf.frameLength.toInt()
-            val arr = FloatArray(frames)
-            for (i in 0 until frames) arr[i] = ch0[i]
-            pushPcm(arr)
         }
 
         engine.prepare()
         engine.startAndReturnError(null)
 
-        // 5) Timer “realtime” al estilo Obj-C: ejecuta whisper_full con parámetros equivalentes
-        val timer = NSTimer.scheduledTimerWithTimeInterval(
-            config.intervalMs.toDouble() / 1000.0,
-            repeats = true
-        ) { _ ->
-            if (total <= 0) return@scheduledTimerWithTimeInterval
-
-            // Copiamos TODO lo acumulado (como el sample Obj-C) o limita a windowSeconds si quieres
-            val take = if (config.windowSeconds > 0)
-                minOf(total, config.windowSeconds * config.sampleRate)
-            else total
-
-            val samples = FloatArray(take)
-            // leer desde w - take (ring buffer)
-            var idx = (w - take + ring.size) % ring.size
-            for (i in 0 until take) {
-                samples[i] = ring[idx]; idx = (idx + 1) % ring.size
-            }
-
-            memScoped {
-                val params =
-                    whisper_full_default_params(whisper_sampling_strategy.WHISPER_SAMPLING_GREEDY)
-                val p = params.ptr.pointed
+        var lastSeenSegment = 0
 
 
-                p.print_realtime = true
-                p.print_progress = false
-                p.print_timestamps = true
-                p.print_special = false
-                p.translate = false
+        val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
-                // Idioma: fijo si viene en config o en el ctor; si no, detectar
-                val lang = config.language ?: language
-                if (!lang.isNullOrEmpty()) {
-                    lang.cstr.getPointer(this).let { p.language = it }
-                    p.detect_language = false
-                } else {
-                    p.detect_language = true
-                }
 
-                val maxThreads =
-                    maxOf(1, (platform.posix.sysconf(platform.posix._SC_NPROCESSORS_ONLN)).toInt())
-                p.n_threads = maxThreads
-                p.offset_ms = 0
-                p.no_context = true              // como en el sample Obj-C
-                p.single_segment = true              // “modo realtime”
-                p.no_timestamps = p.single_segment  // igual que Obj-C
 
-                whisper_reset_timings(c)
-
-                samples.usePinned { buf ->
-                    val rc =
-                        whisper_full_with_state(c, state, params, buf.addressOf(0), samples.size)
-                    if (rc != 0) return@usePinned
-                }
-
-                // Construimos el texto resultante (todo o lo nuevo)
-                val nSeg = whisper_full_n_segments(c)
-                if (nSeg > 0) {
-                    val sb = StringBuilder()
-                    for (i in 0 until nSeg) {
-                        val seg = whisper_full_get_segment_text(c, i)?.toKString() ?: ""
-                        sb.append(seg)
+        val job = scope.launch {
+            try {
+                while (isActive) {
+                    if (total <= 0) {
+                        delay(config.intervalMs)
+                        continue
                     }
-                    val text = sb.toString().trim()
-                    if (text.isNotEmpty()) {
-                        onPartial(TranscriptResult(text = text, language = lang))
+
+
+                    val take = if (config.windowSeconds > 0) minOf(total, config.windowSeconds * config.sampleRate) else total
+                    val samples = FloatArray(take)
+
+                    var idx = (w - take + ring.size) % ring.size
+                    for (i in 0 until take) {
+                        samples[i] = ring[idx]
+                        idx = (idx + 1) % ring.size
                     }
+
+
+                    memScoped {
+                        val params = whisper_full_default_params(whisper_sampling_strategy.WHISPER_SAMPLING_GREEDY)
+                        val p = params.ptr.pointed
+
+                        p.print_realtime = true
+                        p.print_progress = false
+                        p.print_timestamps = true
+                        p.print_special = false
+                        p.translate = false
+                        p.no_context = true
+                        p.single_segment = true
+                        p.no_timestamps = p.single_segment
+                        p.offset_ms = 0
+
+                        val lang = config.language ?: language
+                        if (!lang.isNullOrEmpty()) {
+                            lang.cstr.getPointer(this).let { p.language = it }
+                            p.detect_language = true
+                        } else {
+                            p.detect_language = false
+                        }
+                        p.n_threads = maxOf(1, (platform.posix.sysconf(platform.posix._SC_NPROCESSORS_ONLN)).toInt() - 1)
+
+                        samples.usePinned { buf ->
+                            val rc = whisper_full_with_state(c, state, params, buf.addressOf(0), samples.size)
+                            if (rc != 0) {
+                                // puedes loggear rc
+                            } else {
+
+                                val n = whisper_full_n_segments(c)
+                                if (n > lastSeenSegment) {
+                                    val sb = StringBuilder()
+                                    for (i in lastSeenSegment until n) {
+                                        sb.append(whisper_full_get_segment_text(c, i)?.toKString() ?: "")
+                                    }
+                                    lastSeenSegment = n
+                                    val text = sb.toString().trim()
+                                    if (text.isNotEmpty()) {
+                                        onPartial(TranscriptResult(text = text, language = lang))
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    delay(config.intervalMs)
                 }
+            } catch (_: CancellationException) {
+
+            } catch (t: Throwable) {
+                t.printStackTrace()
             }
         }
 
-        // 6) Devolver handle que limpia todo al parar
-        return IOSStreamHandle {
-            timer.invalidate()
+        // Stop handler
+        return IOSStreamHandle(stopImpl = {
+            job.cancel()
             engine.inputNode.removeTapOnBus(0u)
             engine.stop()
             session.setActive(false, error = null)
             whisper_free_state(state)
-        }
+        })
     }
 
 

@@ -21,6 +21,10 @@ class TranscribeViewModel(
     val transcriber = _transcription.asStateFlow()
 
 
+    private val _live = MutableStateFlow("")
+    val live = _live.asStateFlow()
+
+
     fun startRecording() {
         scope.launch {
             try {
@@ -49,5 +53,32 @@ class TranscribeViewModel(
         }
     }
 
+
+    private var handle: StreamHandle? = null
+
+
+    fun startStreaming() {
+        if (handle?.isActive == true) return
+        handle = engine.startStreaming(StreamConfig()) { partial ->
+
+            println("partial: $partial")
+            scope.launch { _live.emit(partial.text) }
+        }
+    }
+
+
+    fun stopStreaming() {
+        handle?.stop()
+        handle = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopStreaming()
+        try {
+            engine.close()
+        } catch (_: Throwable) {}
+        scope.cancel()
+    }
 
 }
