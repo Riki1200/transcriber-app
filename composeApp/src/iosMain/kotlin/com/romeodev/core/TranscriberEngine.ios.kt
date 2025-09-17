@@ -1,39 +1,71 @@
 package com.romeodev.core
 
-import kotlinx.cinterop.*
-import platform.Foundation.*
-import whisper.*
-
 
 import cnames.structs.whisper_context
-import cnames.structs.whisper_state
 import com.romeodev.decodeWavToFloats
-import kotlinx.atomicfu.atomic
-import platform.AVFAudio.AVAudioCommonFormat
+import kotlinx.cinterop.BetaInteropApi
+import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.MemScope
+import kotlinx.cinterop.ObjCObjectVar
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.alloc
+import kotlinx.cinterop.cstr
+import kotlinx.cinterop.get
 import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.nativeHeap
+import kotlinx.cinterop.pointed
+import kotlinx.cinterop.ptr
+import kotlinx.cinterop.toKString
+import kotlinx.cinterop.usePinned
+import kotlinx.cinterop.value
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import platform.AVFAudio.*
 import platform.AVFAudio.AVAudioConverter
 import platform.AVFAudio.AVAudioConverterInputBlock
 import platform.AVFAudio.AVAudioConverterInputStatus_HaveData
 import platform.AVFAudio.AVAudioEngine
 import platform.AVFAudio.AVAudioFormat
+import platform.AVFAudio.AVAudioInputNode
 import platform.AVFAudio.AVAudioPCMBuffer
+import platform.AVFAudio.AVAudioPCMFormatFloat32
+import platform.AVFAudio.AVAudioPCMFormatFloat64
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
 import platform.AVFAudio.AVAudioSessionModeMeasurement
+import platform.AVFAudio.AVFormatIDKey
+import platform.AVFAudio.AVLinearPCMBitDepthKey
+import platform.AVFAudio.AVLinearPCMIsBigEndianKey
+import platform.AVFAudio.AVLinearPCMIsFloatKey
+import platform.AVFAudio.AVLinearPCMIsNonInterleaved
+import platform.AVFAudio.AVNumberOfChannelsKey
+import platform.AVFAudio.AVSampleRateKey
+import platform.AVFAudio.inputGainSettable
 import platform.AVFAudio.setActive
-import platform.QuartzCore.CACurrentMediaTime
-import platform.UIKit.UIDevice;
-import platform.darwin.DISPATCH_QUEUE_PRIORITY_DEFAULT
-import platform.darwin.dispatch_async
-import platform.darwin.dispatch_get_global_queue
-import platform.darwin.dispatch_get_main_queue
+import platform.AVFAudio.setInputGain
+import platform.CoreAudioTypes.kAudioFormatLinearPCM
+import platform.Foundation.NSBundle
+import platform.Foundation.NSError
+import platform.Foundation.NSLog
+import platform.UIKit.UIDevice
+import whisper.whisper_context_default_params
+import whisper.whisper_free
+import whisper.whisper_free_state
+import whisper.whisper_full
+import whisper.whisper_full_default_params
+import whisper.whisper_full_get_segment_text
+import whisper.whisper_full_get_segment_text_from_state
+import whisper.whisper_full_n_segments
+import whisper.whisper_full_n_segments_from_state
+import whisper.whisper_full_params
+import whisper.whisper_full_with_state
+import whisper.whisper_init_from_file_with_params
+import whisper.whisper_init_state
+import whisper.whisper_reset_timings
+import whisper.whisper_sampling_strategy
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -93,6 +125,12 @@ actual class WhisperEngine actual constructor(
             p.print_special = false
             p.translate = true
             p.detect_language = true
+            p.no_context = false
+            p.single_segment = false
+            p.no_timestamps = p.single_segment
+            p.offset_ms = 0
+
+
 
 
             language?.let { lang ->
@@ -137,7 +175,10 @@ actual class WhisperEngine actual constructor(
         override val isActive: Boolean get() = active
     }
 
-    private fun buildDefaultParams(mem: MemScope, configureCallback: (whisper_full_params) -> Unit = {}): CPointer<whisper_full_params> {
+    private fun buildDefaultParams(
+        mem: MemScope,
+        configureCallback: (whisper_full_params) -> Unit = {}
+    ): CPointer<whisper_full_params> {
         val params =
             whisper_full_default_params(whisper_sampling_strategy.WHISPER_SAMPLING_GREEDY)
 
@@ -154,7 +195,7 @@ actual class WhisperEngine actual constructor(
     }
 
 
-
+    @OptIn(BetaInteropApi::class)
     actual fun startStreaming(
         config: StreamConfig,
         onPartial: (TranscriptResult) -> Unit
@@ -167,16 +208,27 @@ actual class WhisperEngine actual constructor(
         session.setMode(AVAudioSessionModeMeasurement, error = null)
         session.setActive(true, error = null)
 
+        if (session.inputGainSettable) {
+            session.setInputGain(1.0f, error = null)
+        }
+
         val engine = AVAudioEngine()
+
+
         val inputNode = engine.inputNode
+
+
         val hwFormat = inputNode.inputFormatForBus(0u)
 
         val outFormat = AVAudioFormat(
             commonFormat = AVAudioPCMFormatFloat32,
             sampleRate = config.sampleRate.toDouble(),
             channels = 1u,
-            interleaved = false
+            interleaved = false,
+
         )
+
+
 
         val converter = AVAudioConverter(fromFormat = hwFormat, toFormat = outFormat)
 
@@ -185,7 +237,7 @@ actual class WhisperEngine actual constructor(
 
         val maxSamples = 30 * config.sampleRate
         val ring = FloatArray(maxSamples)
-         var w = 0
+        var w = 0
         var total = 0
 
         fun pushPcm(pcm: FloatArray) {
@@ -195,6 +247,7 @@ actual class WhisperEngine actual constructor(
                 if (total < ring.size) total++
             }
         }
+
 
 
         inputNode.installTapOnBus(0u, 1024u, hwFormat) { buffer, _ ->
@@ -209,18 +262,32 @@ actual class WhisperEngine actual constructor(
                 }
                 memScoped {
                     val err = nativeHeap.alloc<ObjCObjectVar<NSError?>>()
-                    val rc = converter.convertToBuffer(outBuf, error = err.ptr, withInputFromBlock = inputBlock)
+                    val rc = converter.convertToBuffer(
+                        outBuf,
+                        error = err.ptr,
+                        withInputFromBlock = inputBlock
+                    )
+
                     if (err.value != null) {
 
                         return@installTapOnBus
                     }
+
+
                     val frames = outBuf.frameLength.toInt()
                     val src = outBuf.floatChannelData?.get(0)
                     if (src != null) {
                         val arr = FloatArray(frames)
-                        for (i in 0 until frames) arr[i] = src[i]
+                        var sum: Float = 0f
+                        for (i in 0 until frames) {
+                            arr[i] = src[i]
+                            sum += arr[i] * arr[i] // Calcula la energía del audio
+                        }
+                        val energy = kotlin.math.sqrt(sum / frames)
+                        println("Energía del buffer: $energy") // Imprime un valor que indica el volumen
                         pushPcm(arr)
                     }
+
                 }
             } catch (t: Throwable) {
                 t.printStackTrace()
@@ -236,7 +303,6 @@ actual class WhisperEngine actual constructor(
         val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
 
-
         val job = scope.launch {
             try {
                 while (isActive) {
@@ -245,8 +311,10 @@ actual class WhisperEngine actual constructor(
                         continue
                     }
 
-
-                    val take = if (config.windowSeconds > 0) minOf(total, config.windowSeconds * config.sampleRate) else total
+                    val take = if (config.windowSeconds > 0) minOf(
+                        total,
+                        config.windowSeconds * config.sampleRate
+                    ) else total
                     val samples = FloatArray(take)
 
                     var idx = (w - take + ring.size) % ring.size
@@ -255,42 +323,51 @@ actual class WhisperEngine actual constructor(
                         idx = (idx + 1) % ring.size
                     }
 
+                    // Fija el array en la memoria para el bloque de transcripción.
+                    // Esto es lo más importante para evitar el EXC_BAD_ACCESS.
+                    samples.usePinned { buf ->
+                        memScoped {
+                            // Creamos los parámetros de la función de C dentro del memScoped.
+                            val params = whisper_full_default_params(whisper_sampling_strategy.WHISPER_SAMPLING_GREEDY)
+                            val p = params.ptr.pointed
 
-                    memScoped {
-                        val params = whisper_full_default_params(whisper_sampling_strategy.WHISPER_SAMPLING_GREEDY)
-                        val p = params.ptr.pointed
+                            p.print_realtime = true
+                            p.print_progress = false
+                            p.print_timestamps = true
+                            p.print_special = false
+                            p.translate = true
+                            p.no_context = false // ¡Importante para streaming!
+                            p.single_segment = false // ¡Importante para streaming!
+                            p.no_timestamps = p.single_segment
+                            p.offset_ms = 0
+                            p.suppress_blank = true
 
-                        p.print_realtime = true
-                        p.print_progress = false
-                        p.print_timestamps = true
-                        p.print_special = false
-                        p.translate = false
-                        p.no_context = true
-                        p.single_segment = true
-                        p.no_timestamps = p.single_segment
-                        p.offset_ms = 0
 
-                        val lang = config.language ?: language
-                        if (!lang.isNullOrEmpty()) {
-                            lang.cstr.getPointer(this).let { p.language = it }
-                            p.detect_language = true
-                        } else {
-                            p.detect_language = false
-                        }
-                        p.n_threads = maxOf(1, (platform.posix.sysconf(platform.posix._SC_NPROCESSORS_ONLN)).toInt() - 1)
-
-                        samples.usePinned { buf ->
-                            val rc = whisper_full_with_state(c, state, params, buf.addressOf(0), samples.size)
-                            if (rc != 0) {
-                                // puedes loggear rc
+                            val lang = config.language ?: language
+                            if (!lang.isNullOrEmpty()) {
+                                lang.cstr.getPointer(this).let { p.language = it }
+                                p.detect_language = false
                             } else {
+                                p.detect_language = true
+                            }
+                            val cpuCount = (platform.posix.sysconf(platform.posix._SC_NPROCESSORS_ONLN)).toInt()
+                            p.n_threads = maxOf(1, minOf(8, cpuCount - 1))
 
-                                val n = whisper_full_n_segments(c)
+                            // La llamada a la función de C ahora está en un entorno controlado.
+                            val rc = whisper_full_with_state(c, state, params, buf.addressOf(0), samples.size)
+
+                            if (rc != 0) {
+                                NSLog("whisper_full_with_state falló: $rc")
+                            } else {
+                                val n = whisper_full_n_segments_from_state(state) // Ojo con esta función
+                                println("current state $n")
                                 if (n > lastSeenSegment) {
                                     val sb = StringBuilder()
                                     for (i in lastSeenSegment until n) {
-                                        sb.append(whisper_full_get_segment_text(c, i)?.toKString() ?: "")
+                                        // Usamos las funciones "from_state"
+                                        sb.append(whisper_full_get_segment_text_from_state(state, i)?.toKString() ?: "")
                                     }
+                                    println("sb $sb")
                                     lastSeenSegment = n
                                     val text = sb.toString().trim()
                                     if (text.isNotEmpty()) {
@@ -303,6 +380,7 @@ actual class WhisperEngine actual constructor(
 
                     delay(config.intervalMs)
                 }
+
             } catch (_: CancellationException) {
 
             } catch (t: Throwable) {

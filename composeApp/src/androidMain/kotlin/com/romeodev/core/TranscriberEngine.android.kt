@@ -14,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable.isActive
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -109,12 +110,15 @@ actual class WhisperEngine actual constructor(
         recorder.startRecording()
 
 
-        val scope = CoroutineScope(Dispatchers.Default)
+        val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
+
         job = scope.launch {
             val readBuf = FloatArray(2048)
             val tick = config.intervalMs
             var lastTick = SystemClock.elapsedRealtime()
-            while (isActive && isActive) {
+
+            while (isActive) {
                 val n = recorder.read(readBuf, 0, readBuf.size, AudioRecord.READ_BLOCKING)
                 if (n > 0) pushPcm(if (n == readBuf.size) readBuf else readBuf.copyOf(n))
 
@@ -143,8 +147,9 @@ actual class WhisperEngine actual constructor(
         }
 
         return AndroidStreamHandle {
-            job?.cancel()
-            recorder.stop(); recorder.release()
+            job.cancel()
+            recorder.stop();
+            recorder.release()
         }
     }
 

@@ -15,7 +15,7 @@ data class TranscriptResult(val text: String, val language: String? = null)
  * This class is used to store the source of the audio file.
  * @param absolutePath the path to the audio file.
  * @param pcm the audio file in float format.
- *
+ *Floats
  */
 sealed class AudioSource {
     data class Path(val absolutePath: String) : AudioSource()
