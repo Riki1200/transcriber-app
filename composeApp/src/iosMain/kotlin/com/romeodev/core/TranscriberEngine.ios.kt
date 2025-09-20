@@ -37,6 +37,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import platform.AVFAudio.AVAudioConverter
 import platform.AVFAudio.AVAudioConverterInputBlock
 import platform.AVFAudio.AVAudioConverterInputStatus_HaveData
@@ -108,6 +109,10 @@ import whisper.whisper_sampling_strategy
 import kotlin.concurrent.AtomicInt
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.TimeSource
 
 
 fun bundledWhisperModelPath(name: String = "ggml-tiny", ext: String = "bin"): String? {
@@ -123,7 +128,13 @@ private const val NUM_BYTES_PER_BUFFER = 16 * 1024
 private class AQHolder(
     val pushI16ToRing: (CPointer<ShortVar>, Int) -> Unit,
     val isRealtime: () -> Boolean
-)
+) {
+    @Volatile
+    var closed = false
+
+    @Volatile
+    var isProcessing = false
+}
 
 typealias AudioQueueBufferRef = CPointer<ByteVar>
 
@@ -137,6 +148,10 @@ private val audioQueueCallback = staticCFunction { userData: COpaquePointer?,
     try {
         if (userData == null) return@staticCFunction
         val holder = userData.asStableRef<AQHolder>().get()
+
+        if (holder.closed) {
+            return@staticCFunction
+        }
 
         if (inBuffer == null) return@staticCFunction
 
@@ -175,7 +190,6 @@ actual class WhisperEngine actual constructor(
 
             val path = modelPath ?: bundledWhisperModelPath()
             ?: error("No se encontró el modelo en el bundle (models/ggml-*.bin)")
-
 
             ctx = whisper_init_from_file_with_params(path, params)
             require(ctx != null) { "No se pudo cargar el modelo en iOS: $path" }
@@ -260,7 +274,7 @@ actual class WhisperEngine actual constructor(
     }
 
 
-    @OptIn(BetaInteropApi::class)
+    @OptIn(BetaInteropApi::class, ExperimentalTime::class)
     actual fun startStreaming(
         config: StreamConfig,
         onPartial: (TranscriptResult) -> Unit
@@ -301,6 +315,7 @@ actual class WhisperEngine actual constructor(
 
 
         val holder = AQHolder(pushI16ToRing = { p, n -> pushFromI16(p, n) }, isRealtime = { false })
+
         val holderRef = StableRef.create(holder)
         val userDataPtr: COpaquePointer = holderRef.asCPointer()
 
@@ -438,47 +453,54 @@ actual class WhisperEngine actual constructor(
                             val cpuCount = (sysconf(_SC_NPROCESSORS_ONLN)).toInt()
                             p.n_threads = maxOf(1, minOf(8, cpuCount - 1))
 
-                            val rc = whisper_full_with_state(
-                                c,
-                                state,
-                                params,
-                                buf.addressOf(0),
-                                samples.size
-                            )
-                            if (rc != 0) {
-                                NSLog("whisper_full_with_state fallo: $rc")
-                            } else {
+                            try {
+                                holder.isProcessing = true
+                                val rc = whisper_full_with_state(
+                                    c,
+                                    state,
+                                    params,
+                                    buf.addressOf(0),
+                                    samples.size
+                                )
+                                if (rc != 0) {
+                                    NSLog("whisper_full_with_state fallo: $rc")
+                                } else {
 
 
 
-                                val nSegments = whisper_full_n_segments_from_state(state)
-                                for (seg in 0 until nSegments) {
-                                    val nTokens = whisper_full_n_tokens_from_state(state, seg)
+                                    val nSegments = whisper_full_n_segments_from_state(state)
+                                    for (seg in 0 until nSegments) {
+                                        val nTokens = whisper_full_n_tokens_from_state(state, seg)
 
-                                    val segmentText = buildString {
-                                        for (tok in 0 until nTokens) {
-                                            val t = whisper_full_get_token_text_from_state(ctx, state, seg, tok)?.toKString() ?: ""
+                                        val segmentText = buildString {
+                                            for (tok in 0 until nTokens) {
+                                                val t = whisper_full_get_token_text_from_state(ctx, state, seg, tok)?.toKString() ?: ""
 
-                                            if (!t.startsWith("[_") && !t.endsWith("_]")) {
-                                                append(t)
+                                                if (!t.startsWith("[_") && !t.endsWith("_]")) {
+                                                    append(t)
+                                                }
                                             }
+                                        }
+
+                                        val text = segmentText.trim()
+                                        if (text.isNotEmpty()) {
+                                            onPartial(
+                                                TranscriptResult(
+                                                    text = text,
+                                                    language = lang
+                                                )
+                                            )
                                         }
                                     }
 
-                                    val text = segmentText.trim()
-                                    if (text.isNotEmpty()) {
-                                        onPartial(
-                                            TranscriptResult(
-                                                text = text,
-                                                language = lang
-                                            )
-                                        )
-                                    }
                                 }
-
-
-
+                            } catch (t: Throwable) {
+                                t.printStackTrace()
+                            } finally {
+                                holder.isProcessing = false
                             }
+
+
                         }
                     }
 
@@ -491,7 +513,29 @@ actual class WhisperEngine actual constructor(
         }
 
         return IOSStreamHandle(stopImpl = {
-            job.cancel()
+
+
+            holderRef.get().closed = true
+
+            runBlocking {
+                job.cancel()
+                try {
+                    job.join()
+                } catch (_: CancellationException) { /* ignore */ }
+
+
+                val start = TimeSource.Monotonic.markNow()
+                while (holderRef.get().isProcessing) {
+                    // Delay pequeño para no bloquear CPU
+                    delay(10)
+                    // Timeout de seguridad (ej: 2 segundos)
+                    if (start.elapsedNow() > 2.seconds) {
+                        NSLog("stopImpl: timeout esperando a isProcessing=false")
+                        break
+                    }
+                }
+            }
+
 
             AudioQueueStop(queue, true)
             for (br in bufferRefs) AudioQueueFreeBuffer(queue, br)
