@@ -490,7 +490,6 @@ actual class WhisperEngine actual constructor(
             }
         }
 
-        // Stop handler — libera todo lo creado
         return IOSStreamHandle(stopImpl = {
             job.cancel()
 
@@ -498,12 +497,12 @@ actual class WhisperEngine actual constructor(
             for (br in bufferRefs) AudioQueueFreeBuffer(queue, br)
             AudioQueueDispose(queue, true)
 
-            // liberar nativeHeap allocations
+
             for (pv in bufferPtrList) nativeHeap.free(pv)
             nativeHeap.free(queueVar)
             nativeHeap.free(dataFormat)
 
-            // liberar StableRef y whisper state
+
             holderRef.dispose()
             whisper_free_state(state)
 
@@ -521,7 +520,8 @@ actual class WhisperEngine actual constructor(
         private var active = true
         override fun stop() {
             if (active) {
-                active = false; stopImpl()
+                active = false;
+                stopImpl()
             }
         }
 
