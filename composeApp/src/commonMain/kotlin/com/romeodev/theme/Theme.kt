@@ -9,7 +9,14 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
-
+import com.slapps.cupertino.adaptive.AdaptiveTheme
+import com.slapps.cupertino.adaptive.CupertinoThemeSpec
+import com.slapps.cupertino.adaptive.ExperimentalAdaptiveApi
+import com.slapps.cupertino.adaptive.MaterialThemeSpec
+import androidx.compose.material3.darkColorScheme as m3DarkColorScheme
+import androidx.compose.material3.lightColorScheme as m3LightColorScheme
+import com.slapps.cupertino.theme.darkColorScheme as cupertinoDarkColorScheme
+import com.slapps.cupertino.theme.lightColorScheme as cupertinoLightColorScheme
 
 val lightScheme =
     lightColorScheme(
@@ -89,6 +96,73 @@ val darkScheme =
         surfaceContainerHighest = surfaceContainerHighestDark,
     )
 
+
+val AppLightMaterialScheme = m3LightColorScheme(
+    primary = Color(0xFFADD8E6),
+    secondary = Color(0xFFB2DFDB),
+    background = Color(0xFFFFFBFE),
+    surface = Color(0xFFF2F2F7),
+    onPrimary = Color(0xFF1E1E1E),
+    onSecondary = Color(0xFF1E1E1E),
+    onBackground = Color(0xFF1C1B1F),
+    onSurface = Color(0xFF1C1B1F)
+)
+
+val AppDarkMaterialScheme = m3DarkColorScheme(
+    primary = Color(0xFF87BFFF),
+    secondary = Color(0xFF80CBC4),
+    background = Color(0xFF121212),
+    surface = Color(0xFF1E1E1E),
+    onPrimary = Color(0xFFEFEFEF),
+    onSecondary = Color(0xFFE0E0E0),
+    onBackground = Color(0xFFE6E1E5),
+    onSurface = Color(0xFFE6E1E5)
+)
+
+
+val AppLightCupertinoScheme = cupertinoLightColorScheme(
+    accent = Color(0xFFADD8E6),
+    label = Color(0xFF2D2D2D),
+    secondaryLabel = Color(0xFF6D6D6D),
+    tertiaryLabel = Color(0xFFA0A0A0),
+    quaternaryLabel = Color(0xFFC0C0C0),
+    systemFill = Color(0xFFD0F0FD),
+    secondarySystemFill = Color(0xFFFDE2E4),
+    tertiarySystemFill = Color(0xFFFFF5E5),
+    quaternarySystemFill = Color(0xFFE5F4EA),
+    placeholderText = Color(0xFFB0B0B0),
+    separator = Color(0xFFE0E0E0),
+    opaqueSeparator = Color(0xFFCCCCCC),
+    link = Color(0xFF9D9DED),
+    systemGroupedBackground = Color(0xFFF7F7FA),
+    secondarySystemGroupedBackground = Color(0xFFF2F2F5),
+    tertiarySystemGroupedBackground = Color(0xFFEBEBF0),
+    systemBackground = Color(0xFFFFFFFF),
+    secondarySystemBackground = Color(0xFFF9F9F9),
+    tertiarySystemBackground = Color(0xFFF2F2F2),
+)
+val AppDarkCupertinoScheme = cupertinoDarkColorScheme(
+    accent = Color(0xFF87BFFF),
+    label = Color(0xFFEDEDED),
+    secondaryLabel = Color(0xFFBBBBBB),
+    tertiaryLabel = Color(0xFF999999),
+    quaternaryLabel = Color(0xFF777777),
+    systemFill = Color(0xFF1E3A50),
+    secondarySystemFill = Color(0xFF4E3A50),
+    tertiarySystemFill = Color(0xFF5A3E2B),
+    quaternarySystemFill = Color(0xFF3B4E41),
+    placeholderText = Color(0xFF888888),
+    separator = Color(0xFF444444),
+    opaqueSeparator = Color(0xFF333333),
+    link = Color(0xFFB0A7F3),
+    systemGroupedBackground = Color(0xFF121212),
+    secondarySystemGroupedBackground = Color(0xFF1C1C1E),
+    tertiarySystemGroupedBackground = Color(0xFF2A2A2E),
+    systemBackground = Color(0xFF000000),
+    secondarySystemBackground = Color(0xFF111111),
+    tertiarySystemBackground = Color(0xFF1A1A1A),
+)
+
 @Immutable
 data class ColorFamily(
     val color: Color,
@@ -110,7 +184,7 @@ val unspecified_scheme =
 expect fun getDynamicColorScheme(darkTheme: Boolean): ColorScheme?
 
 
-
+@OptIn(ExperimentalAdaptiveApi::class)
 @Composable
 fun ApplicationTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -174,11 +248,21 @@ fun ApplicationTheme(
                 fontFamily = getPoppinsFontFamily()
             ),
         )
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = appTypography,
-        content = content,
-    )
+
+
+    AdaptiveTheme(
+        material = MaterialThemeSpec(
+            colorScheme = if (darkTheme) darkScheme
+            else lightScheme
+        ),
+        cupertino = CupertinoThemeSpec(
+            colorScheme = if (darkTheme) AppDarkCupertinoScheme
+            else AppLightCupertinoScheme
+        )
+
+    ) {
+        content()
+    }
 
 
 }

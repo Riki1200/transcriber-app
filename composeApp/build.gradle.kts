@@ -171,6 +171,13 @@ kotlin {
 
             // backhandler
             implementation(libs.ui.backhandler)
+
+
+            implementation(libs.cupertino)
+            implementation(libs.cupertino.native)
+
+            implementation(libs.cupertino.adaptive)
+            implementation(libs.cupertino.icons.extended)
         }
         commonTest.dependencies {
             // Testing Framework

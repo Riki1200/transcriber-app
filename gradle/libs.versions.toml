@@ -69,6 +69,8 @@ espressoCore = "3.7.0"
 appcompat = "1.7.1"
 material = "1.12.0"
 
+cupertino = "2.2.5"
+
 [libraries]
 # Accompinist
 accompanist-system-ui-controller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist-system-ui-controller" }
@@ -145,6 +147,14 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+
+
+cupertino = { group = "io.github.schott12521", name = "cupertino", version.ref = "cupertino" }
+cupertino-adaptive = { group = "io.github.schott12521", name = "cupertino-adaptive", version.ref = "cupertino" }
+
+
+cupertino-native = { group = "io.github.schott12521", name = "cupertino-native", version.ref = "cupertino" }
+cupertino-icons-extended = { group = "io.github.schott12521", name = "cupertino-icons-extended", version.ref = "cupertino" }
 
 [plugins]
 # Android Plugins

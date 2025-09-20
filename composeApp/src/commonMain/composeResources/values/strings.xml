@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">KMP Starter</string>
+    <string name="app_name">Transcribily</string>
 
     <!-- Auth Screens -->
     <string name="auth_welcome_back">Welcome Back</string>
@@ -24,4 +24,20 @@
     <string name="auth_forgot_password_title">Forgot Password</string>
     <string name="auth_forgot_password_desc">Enter your email address and we'll send you a link to reset your password</string>
     <string name="auth_send_link">Send Link</string>
+    <string name="next">Next</string>
+    <string name="finish">Finish</string>
+
+
+    <string name="onboarding_welcome_title">Welcome to Transcribily</string>
+    <string name="onboarding_welcome_subtitle">Privacy-first, realm-time transcription</string>
+    <string name="onboarding_welcome_desc">Transform speech to text instantly with on-device AI. Your audio never leaves your device.</string>
+
+    <string name="onboarding_fast_title">Lightning Fast</string>
+    <string name="onboarding_fast_subtitle">Real-time captions with AI</string>
+    <string name="onboarding_fast_desc">Get accurate transcriptions in under 300ms with whisper.cpp. Perfect for meetings, interviews, and lectures.</string>
+
+    <string name="onboarding_features_title">Professional Features</string>
+    <string name="onboarding_features_subtitle">Everything you need</string>
+    <string name="onboarding_features_desc">Speaker identification, word-level timestamps, multiple export formats, and more.</string>
+
 </resources>
