@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.romeodev.core.ui.components.icons.AppleIcon
 import com.romeodev.core.ui.components.icons.GoogleIcon
 import com.romeodev.core.ui.utils.screen.getScreenSize
 import com.romeodev.theme.Dimens
@@ -107,6 +108,88 @@ fun GoogleSignInButtonUI(
                     Spacer(modifier = Modifier.width(Dimens.paddingMedium))
                     Text(
                         text = "Continue with Google",
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun AppleSignInButton(
+    isAppleSignInLoading: Boolean,
+    onAppleSignInClick: () -> Unit,
+) {
+    val screenWidth = getScreenSize().width.value
+    val buttonWidth by animateFloatAsState(
+        targetValue = if (isAppleSignInLoading) 56f else screenWidth - 32f,
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow,
+            ),
+        label = "width_animation",
+    )
+
+    OutlinedButton(
+        onClick = onAppleSignInClick,
+        enabled = !isAppleSignInLoading,
+        modifier =
+            Modifier
+                .width(buttonWidth.dp)
+                .height(Dimens.buttonHeight),
+        border =
+            BorderStroke(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline,
+            ),
+        colors =
+            ButtonDefaults.outlinedButtonColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+        contentPadding =
+            PaddingValues(
+                horizontal = if (isAppleSignInLoading) 0.dp else 16.dp,
+                vertical = 0.dp,
+            ),
+    ) {
+        AnimatedContent(
+            targetState = isAppleSignInLoading,
+            transitionSpec = {
+                fadeIn(
+                    animationSpec = tween(220, delayMillis = 90),
+                ) +
+                        scaleIn(
+                            animationSpec = tween(220, delayMillis = 90),
+                        ) togetherWith fadeOut(
+                    animationSpec = tween(90),
+                ) +
+                        scaleOut(
+                            animationSpec = tween(90),
+                        )
+            },
+            label = "loading_animation",
+        ) { loading ->
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp,
+                )
+            } else {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    AppleIcon(
+                        modifier = Modifier.size(24.dp),
+                    )
+                    Spacer(modifier = Modifier.width(Dimens.paddingMedium))
+                    Text(
+                        text = "Continue with Apple",
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }

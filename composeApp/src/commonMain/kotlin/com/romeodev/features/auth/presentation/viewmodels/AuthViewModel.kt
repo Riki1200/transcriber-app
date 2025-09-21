@@ -95,12 +95,13 @@ class AuthViewModel(
             }
 
             is AuthEvents.OnSignedInWithGoogle -> onSignedWithGoogle(
-                firebaseUser = event.firebaseUser
+                firebaseUser = event.firebaseUser,
+                method = event.method
             )
         }
     }
 
-    private fun onSignedWithGoogle(firebaseUser: FirebaseUser?) {
+    private fun onSignedWithGoogle(firebaseUser: FirebaseUser?, method: SignInMethod) {
         if (firebaseUser == null) {
             viewModelScope.launch {
                 SnackbarController.sendAlert("Unable to login with Google")
@@ -147,7 +148,7 @@ class AuthViewModel(
                 email = firebaseUser.email!!,
                 userId = firebaseUser.uid,
                 profilePhoto = firebaseUser.photoURL,
-                method = SignInMethod.GOOGLE
+                method = method
             )
 
             try {

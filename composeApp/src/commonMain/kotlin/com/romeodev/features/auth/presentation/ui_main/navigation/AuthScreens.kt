@@ -15,4 +15,8 @@ sealed class AuthScreens {
 
     @Serializable
     data object SignUp : AuthScreens()
+
+
+    @Serializable
+    data object StartScreen : AuthScreens()
 }

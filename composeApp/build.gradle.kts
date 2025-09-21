@@ -1,5 +1,7 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -64,9 +66,7 @@ kotlin {
         androidMain.dependencies {
 
 
-
-
-            implementation (project(":lib"))
+            implementation(project(":lib"))
 
             // Compose UI
             implementation(compose.preview)
@@ -95,8 +95,8 @@ kotlin {
             implementation(libs.accompanist.system.ui.controller)
 
 
-            implementation("androidx.media3:media3-transformer:1.8.0")
-            implementation("androidx.media3:media3-common:1.8.0")
+            implementation(libs.androidx.media3.transformer)
+            implementation(libs.androidx.media3.common)
 
 
         }
@@ -198,7 +198,33 @@ kotlin {
     }
 }
 
+
 android {
+
+    val keystorePropsFile = rootProject.file("composeApp/keystore.properties")
+    val keystoreProperties = Properties()
+    if (keystorePropsFile.exists()) {
+        keystoreProperties.load(FileInputStream(keystorePropsFile))
+    } else {
+        println("No se encontró el archivo de propiedades de keystore: $keystorePropsFile")
+    }
+
+
+    fun envOrProp(keyProp: String, envKey: String): String? {
+        val fromProp = keystoreProperties[keyProp]?.toString()?.trim()
+        if (!fromProp.isNullOrBlank()) return fromProp
+        val fromEnv = System.getenv(envKey)?.trim()
+        if (!fromEnv.isNullOrBlank()) return fromEnv
+        return null
+    }
+
+
+    val ksFilePath = envOrProp("storeFile", "KEYSTORE_FILE")
+    val ksStorePassword = envOrProp("storePassword", "KEYSTORE_PASSWORD")
+    val ksKeyAlias = envOrProp("keyAlias", "KEY_ALIAS")
+    val ksKeyPassword = envOrProp("keyPassword", "KEY_PASSWORD")
+
+
     namespace = "com.romeodev"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
@@ -225,10 +251,65 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+
+
+    signingConfigs {
+        create("release") {
+            if (!ksFilePath.isNullOrBlank()) {
+                val f = file(ksFilePath)
+                if (f.exists()) {
+                    storeFile = f
+                }
+            }
+            storePassword = ksStorePassword
+            keyAlias = ksKeyAlias
+            keyPassword = ksKeyPassword
+        }
+
+
+
+        getByName("debug") {
+
+            val debugKeystore = file(System.getProperty("user.home") + "/.android/debug.keystore")
+            if (debugKeystore.exists()) {
+                storeFile = debugKeystore
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
+    }
+
+    val releaseSigningConfig = signingConfigs.findByName("release")
+    val hasValidReleaseSigning = run {
+        try {
+            val sf = releaseSigningConfig?.storeFile
+            val sp = releaseSigningConfig?.storePassword
+            val ka = releaseSigningConfig?.keyAlias
+            val kp = releaseSigningConfig?.keyPassword
+
+            logger.warn("Release signing ${sf?.absolutePath} (alias=$ka)")
+
+            val valid = sf != null && sf.exists() && !sp.isNullOrBlank() && !ka.isNullOrBlank() && !kp.isNullOrBlank()
+            if (valid) {
+                logger.lifecycle("Release signing configurada correctamente: ${sf?.absolutePath} (alias=$ka)")
+            } else {
+                logger.warn("Release signing inválida/incompleta. storeFile: ${sf?.absolutePath ?: "null"}, alias: ${ka ?: "null"}, storePwdSet: ${!sp.isNullOrBlank()}, keyPwdSet: ${!kp.isNullOrBlank()}")
+            }
+            valid
+        } catch (e: Exception) {
+            logger.warn("Error comprobando release signing: ${e.message}")
+            false
+        }
+    }
+
     buildTypes {
         debug {
             buildConfigField("String", "API_BASE_URL", "\"https://staging.example.com/\"")
             buildConfigField("boolean", "ENABLE_LOGS", "true")
+
+            signingConfig = signingConfigs.findByName("debug")
         }
 
         release {
@@ -242,6 +323,14 @@ android {
 
             buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"")
             buildConfigField("boolean", "ENABLE_LOGS", "false")
+
+            signingConfig = if (hasValidReleaseSigning) {
+                signingConfigs.getByName("release")
+            } else {
+
+                println("WARNING: No valida release keystore encontrada. Usando keystore DEBUG como fallback para release build.")
+                signingConfigs.getByName("debug")
+            }
         }
     }
     compileOptions {
@@ -250,10 +339,10 @@ android {
     }
 }
 dependencies {
-    // Debug Tools
+
     debugImplementation(compose.uiTooling)
 
-    // Database
+
     add("kspAndroid", libs.room.compiler)
     add("kspIosX64", libs.room.compiler)
     add("kspIosArm64", libs.room.compiler)

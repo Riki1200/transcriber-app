@@ -43,7 +43,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import com.romeodev.core.ui.layouts.loading.LoadingLayout
 import com.romeodev.core.utils.logging.Log
+import com.romeodev.features.auth.domain.enums.SignInMethod
 import com.romeodev.features.auth.presentation.events.AuthEvents
+import com.romeodev.features.auth.presentation.ui_main.components.AppleSignInButton
 import com.romeodev.features.auth.presentation.ui_main.components.GoogleSignInButton
 import com.romeodev.features.auth.presentation.ui_main.dialogs.ForgetPasswordDialog
 import com.romeodev.features.auth.presentation.ui_main.navigation.AuthScreens
@@ -78,10 +80,11 @@ fun SignInScreen(
         onEmailChange = viewModel::onEmailChange,
         onPasswordChange = viewModel::onPasswordChange,
         onPasswordVisibilityChange = { isPasswordVisible = it },
-        onGoogleSignedIn = { firebaseUser ->
+        onGoogleSignedIn = { firebaseUser, method ->
             viewModel.onEvent(
                 AuthEvents.OnSignedInWithGoogle(
-                    firebaseUser = firebaseUser
+                    firebaseUser = firebaseUser,
+                    method = method
                 )
             )
         },
@@ -97,7 +100,8 @@ fun SignInScreen(
                     route = AuthScreens.SignUp,
                 )
             )
-        }
+        },
+
     )
 
     // Forget Password Dialog
@@ -137,7 +141,7 @@ fun SignInScreenContent(
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onPasswordVisibilityChange: (Boolean) -> Unit,
-    onGoogleSignedIn: (FirebaseUser?) -> Unit,
+    onGoogleSignedIn: (FirebaseUser?, SignInMethod) -> Unit,
     onSignInClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
     onSignUpClick: () -> Unit,
@@ -285,6 +289,11 @@ fun SignInScreenContent(
         var isGoogleLoading by rememberSaveable {
             mutableStateOf(false)
         }
+
+        var isAppleLoading by rememberSaveable {
+            mutableStateOf(false)
+        }
+
         GoogleSignInButton(
             isLoading = isGoogleLoading,
             setIsLoading = { isGoogleLoading = it },
@@ -298,7 +307,27 @@ fun SignInScreenContent(
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-                onGoogleSignedIn(it.getOrNull())
+                println("FIREBASE ${it.getOrNull()?.email}")
+                onGoogleSignedIn(it.getOrNull(), SignInMethod.GOOGLE)
+            }
+        )
+
+
+        AppleSignInButton(
+            isLoading = isAppleLoading,
+            setIsLoading = { isAppleLoading = it },
+            onFirebaseResult = {
+                try {
+                    Log.e(
+                        tag = null,
+                        "FIREBASE ${it.exceptionOrNull()}"
+                    )
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                println("FIREBASE ${it.getOrNull()?.email}")
+                onGoogleSignedIn(it.getOrNull(), SignInMethod.GOOGLE)
             }
         )
 

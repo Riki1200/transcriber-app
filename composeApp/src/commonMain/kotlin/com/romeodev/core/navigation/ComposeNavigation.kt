@@ -12,6 +12,7 @@ import com.romeodev.core.events.utils.ObserveAsEvents
 import com.romeodev.core.navigation.nav_graphs.appNavGraph
 import com.romeodev.core.navigation.screens.StarterScreens
 import com.romeodev.core.ui.composition_locals.LocalNavController
+import com.romeodev.features.auth.presentation.ui_main.navigation.AuthScreens
 import com.romeodev.features.trancription.presentation.viewModels.TranscribeViewModel
 import org.koin.compose.koinInject
 
@@ -27,7 +28,7 @@ fun ComposeNavigation(
     CompositionLocalProvider(LocalNavController provides navController) {
         NavHost(
             navController = navController,
-            startDestination = StarterScreens.Root
+            startDestination = AuthScreens.Root
         ) {
 
             appNavGraph(

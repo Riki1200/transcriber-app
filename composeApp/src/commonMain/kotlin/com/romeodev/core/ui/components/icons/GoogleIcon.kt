@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 
 import org.jetbrains.compose.resources.painterResource
 import transcriberfast.composeapp.generated.resources.Res
+import transcriberfast.composeapp.generated.resources.apple_logo_black
 import transcriberfast.composeapp.generated.resources.ic_google
 
 
@@ -18,4 +19,17 @@ fun GoogleIcon(modifier: Modifier = Modifier) {
         contentDescription = "Google Icon",
         modifier = modifier,
     )
+}
+
+
+@Composable
+fun AppleIcon(modifier: Modifier = Modifier) {
+    Image(
+        painter = painterResource(
+            resource = Res.drawable.apple_logo_black
+        ),
+        contentDescription = "Apple Icon",
+        modifier = modifier,
+    )
+
 }

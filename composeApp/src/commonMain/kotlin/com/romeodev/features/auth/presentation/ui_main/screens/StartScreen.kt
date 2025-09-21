@@ -1,4 +1,4 @@
-package com.romeodev.features.start.presentation.ui_main.screens
+package com.romeodev.features.auth.presentation.ui_main.screens
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -17,11 +17,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.outlined.Bolt
+import androidx.compose.material.icons.outlined.ElectricBolt
+import androidx.compose.material.icons.outlined.Light
+import androidx.compose.material.icons.outlined.RecordVoiceOver
+import androidx.compose.material.icons.outlined.Shield
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.material.icons.outlined.VoiceChat
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,9 +48,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.romeodev.core.ui.components.ScreenPreview
+import com.romeodev.features.auth.presentation.events.AuthEvents
+import com.romeodev.features.auth.presentation.ui_main.navigation.AuthScreens
+import com.romeodev.features.auth.presentation.viewmodels.AuthViewModel
 import com.slapps.cupertino.adaptive.AdaptiveButton
 import com.slapps.cupertino.adaptive.AdaptiveScaffold
 import com.slapps.cupertino.adaptive.ExperimentalAdaptiveApi
@@ -47,6 +65,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.koinInject
 import transcriberfast.composeapp.generated.resources.Res
 import transcriberfast.composeapp.generated.resources.finish
 import transcriberfast.composeapp.generated.resources.next
@@ -54,7 +73,8 @@ import transcriberfast.composeapp.generated.resources.*
 
 
 data class OnboardingPage(
-    val imageRes: DrawableResource?,
+    val imageRes: ImageVector?,
+    val iconColor: Color? = null,
     val title: StringResource,
     val subtitle: StringResource,
     val description: StringResource
@@ -63,19 +83,20 @@ data class OnboardingPage(
 val onboardingPages = listOf(
     OnboardingPage(
         title = Res.string.onboarding_welcome_title,
-        imageRes = null,
+        imageRes = Icons.Outlined.RecordVoiceOver,
         subtitle = Res.string.onboarding_welcome_subtitle,
-        description = Res.string.onboarding_welcome_desc
+        description = Res.string.onboarding_welcome_desc,
+        iconColor = Color.Red
     ),
     OnboardingPage(
         title = Res.string.onboarding_fast_title,
-        imageRes = null,
+        imageRes = Icons.Outlined.ElectricBolt,
         subtitle = Res.string.onboarding_fast_subtitle,
         description = Res.string.onboarding_fast_desc,
     ),
     OnboardingPage(
         title = Res.string.onboarding_features_title,
-        imageRes = null,
+        imageRes = Icons.Outlined.StarOutline,
         subtitle = Res.string.onboarding_features_subtitle,
         description = Res.string.onboarding_features_desc,
     )
@@ -85,7 +106,8 @@ val onboardingPages = listOf(
 @Composable
 @OptIn(ExperimentalAnimationApi::class, ExperimentalAdaptiveApi::class)
 fun StartScreen(
-    onFinished: () -> Unit = {}
+    onFinished: () -> Unit = {},
+    viewModel: AuthViewModel = koinInject(),
 ) {
     var currentPage by remember { mutableStateOf(0) }
     val progressList =
@@ -134,15 +156,18 @@ fun StartScreen(
                     label = "PageTransition"
                 ) { animatedPage ->
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-//                        Image(
-//                            painter = painterResource(animatedPage.imageRes),
-//                            contentDescription = stringResource(animatedPage.title),
-//                            modifier = Modifier
-//                                .fillMaxWidth()
-//                                .height(300.dp)
-//                        )
+
+
+                        if (animatedPage.imageRes != null)
+                            Icon(
+                                imageVector = animatedPage.imageRes,
+                                tint = animatedPage.iconColor ?: MaterialTheme.colorScheme.primary,
+                                contentDescription = "",
+                                modifier = Modifier.size(100.dp)
+                            )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
@@ -157,7 +182,7 @@ fun StartScreen(
                         Text(
                             text = stringResource(animatedPage.description).trim(),
                             fontSize = 16.sp,
-                            modifier = Modifier.padding(horizontal = 16.dp),
+                            modifier = Modifier,
                             color = Color.Gray
                         )
                     }
@@ -170,8 +195,10 @@ fun StartScreen(
 
                         LinearProgressIndicator(
                             progress = { it.coerceIn(0f, 1f) },
+                            strokeCap = StrokeCap.Square,
+                            drawStopIndicator = {},
                             modifier = Modifier
-                                .width(50.dp)
+                                .width(10.dp)
                                 .height(8.dp)
                                 .clip(RoundedCornerShape(8.dp)),
                             color = MaterialTheme.colorScheme.primary,
@@ -188,7 +215,7 @@ fun StartScreen(
                             currentPage++
 
                         } else {
-                            onFinished()
+                            viewModel.onEvent(AuthEvents.Navigate(AuthScreens.SignIn))
                         }
                     },
 
@@ -215,5 +242,8 @@ fun StartScreen(
 @Preview
 @Composable
 fun StartScreenPreview() {
-    StartScreen()
+    ScreenPreview() {
+        StartScreen()
+    }
+
 }

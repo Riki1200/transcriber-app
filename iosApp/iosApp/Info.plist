@@ -9,13 +9,11 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.1061850765240-jo8cgscsdv3pqq9ofbjdvsn8m82kc8jj</string>
+				<string>com.googleusercontent.apps.558815437752-rl4ue48amo4r4klnc5aq03h38n7ormgg</string>
 			</array>
 		</dict>
 	</array>
 	<key>GIDClientID</key>
-	<string>1061850765240-jo8cgscsdv3pqq9ofbjdvsn8m82kc8jj.apps.googleusercontent.com</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>We need microphone for transcriber the audio file</string>
+	<string>558815437752-rl4ue48amo4r4klnc5aq03h38n7ormgg.apps.googleusercontent.com</string>
 </dict>
 </plist>

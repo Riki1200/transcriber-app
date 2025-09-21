@@ -6,13 +6,14 @@ import androidx.navigation.navigation
 import com.romeodev.core.ui.utils.navigation.appNavComposable
 import com.romeodev.features.auth.presentation.ui_main.screens.SignInScreen
 import com.romeodev.features.auth.presentation.ui_main.screens.SignUpScreen
+import com.romeodev.features.auth.presentation.ui_main.screens.StartScreen
 
 fun NavGraphBuilder.authNavGraph(
     scaffoldModifier: Modifier,
 ) {
 
     navigation<AuthScreens.Root>(
-        startDestination = AuthScreens.SignIn,
+        startDestination = AuthScreens.StartScreen,
     ) {
         appNavComposable<AuthScreens.SignIn> {
             SignInScreen(
@@ -23,6 +24,15 @@ fun NavGraphBuilder.authNavGraph(
         appNavComposable<AuthScreens.SignUp> {
             SignUpScreen(
                 modifier = scaffoldModifier,
+            )
+        }
+
+
+        appNavComposable<AuthScreens.StartScreen> {
+            StartScreen(
+                onFinished = {
+
+                }
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.romeodev.features.auth.presentation.events
 
+import com.romeodev.features.auth.domain.enums.SignInMethod
 import com.romeodev.features.auth.presentation.ui_main.navigation.AuthScreens
 import dev.gitlive.firebase.auth.FirebaseUser
 
@@ -10,6 +11,7 @@ sealed class AuthEvents {
     data object StartSignInWithGoogle : AuthEvents()
 
     data class OnSignedInWithGoogle(
+        val method: SignInMethod = SignInMethod.GOOGLE,
         val firebaseUser: FirebaseUser?=null
     ) : AuthEvents()
 

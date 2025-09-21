@@ -43,7 +43,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import com.romeodev.core.ui.layouts.loading.LoadingLayout
+import com.romeodev.core.utils.logging.Log
 import com.romeodev.features.auth.presentation.events.AuthEvents
+import com.romeodev.features.auth.presentation.ui_main.components.AppleSignInButton
 import com.romeodev.features.auth.presentation.ui_main.components.GoogleSignInButton
 import com.romeodev.features.auth.presentation.ui_main.navigation.AuthScreens
 import com.romeodev.features.auth.presentation.viewmodels.AuthViewModel
@@ -337,6 +339,11 @@ private fun SignUpScreenContent(
         var isGoogleLoading by rememberSaveable {
             mutableStateOf(false)
         }
+        var isAppleLoading by rememberSaveable {
+            mutableStateOf(false)
+        }
+
+
         GoogleSignInButton(
             isLoading = isGoogleLoading,
             setIsLoading = { isGoogleLoading = it },
@@ -345,6 +352,26 @@ private fun SignUpScreenContent(
                 onGoogleSignedIn(it.getOrNull())
             }
         )
+
+
+        AppleSignInButton(
+            isLoading = isAppleLoading,
+            setIsLoading = { isAppleLoading = it },
+            onFirebaseResult = {
+                try {
+                    Log.e(
+                        tag = null,
+                        "FIREBASE ${it.exceptionOrNull()}"
+                    )
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                println("FIREBASE ${it.getOrNull()?.email}")
+                onGoogleSignedIn(it.getOrNull())
+            }
+        )
+
 
         Spacer(modifier = Modifier.weight(1f))
 
