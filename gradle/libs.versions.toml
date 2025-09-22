@@ -9,17 +9,17 @@ android-targetSdk = "36"
 # Kotlin Ecosystem
 calfFilePicker = "0.8.0"
 coilCompose = "3.2.0"
-kotlin = "2.2.10"
+kotlin = "2.2.20"
 kotlinx-datetime = "0.7.1"
 kotlinx-serialization-json = "1.9.0"
 coroutines = "1.10.2"
 
 # Compose & UI
-compose-multiplatform = "1.8.2"
+compose-multiplatform = "1.9.0"
 androidx-activity-compose = "1.10.1"
 androidx-lifecycle = "2.9.1"
 media3Transformer = "1.8.0"
-navigation-compose = "2.9.0-beta03"
+navigation-compose = "2.9.0"
 
 # Firebase & Authentication
 firebase-bom = "33.16.0"

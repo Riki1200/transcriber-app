@@ -42,6 +42,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import com.romeodev.core.Platform
+import com.romeodev.core.platform
 import com.romeodev.core.ui.layouts.loading.LoadingLayout
 import com.romeodev.core.utils.logging.Log
 import com.romeodev.features.auth.presentation.events.AuthEvents
@@ -348,29 +350,21 @@ private fun SignUpScreenContent(
             isLoading = isGoogleLoading,
             setIsLoading = { isGoogleLoading = it },
             onFirebaseResult = {
-
                 onGoogleSignedIn(it.getOrNull())
             }
         )
 
 
-        AppleSignInButton(
-            isLoading = isAppleLoading,
-            setIsLoading = { isAppleLoading = it },
-            onFirebaseResult = {
-                try {
-                    Log.e(
-                        tag = null,
-                        "FIREBASE ${it.exceptionOrNull()}"
-                    )
-
-                } catch (e: Exception) {
-                    e.printStackTrace()
+        if (platform == Platform.IOS) {
+            AppleSignInButton(
+                isLoading = isAppleLoading,
+                setIsLoading = { isAppleLoading = it },
+                onFirebaseResult = {
+                    onGoogleSignedIn(it.getOrNull(),)
                 }
-                println("FIREBASE ${it.getOrNull()?.email}")
-                onGoogleSignedIn(it.getOrNull())
-            }
-        )
+            )
+        }
+
 
 
         Spacer(modifier = Modifier.weight(1f))

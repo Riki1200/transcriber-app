@@ -15,6 +15,12 @@ fun NavGraphBuilder.authNavGraph(
     navigation<AuthScreens.Root>(
         startDestination = AuthScreens.StartScreen,
     ) {
+        appNavComposable<AuthScreens.StartScreen> {
+            StartScreen(
+                modifier = scaffoldModifier,
+            )
+        }
+
         appNavComposable<AuthScreens.SignIn> {
             SignInScreen(
                 modifier = scaffoldModifier,
@@ -27,13 +33,5 @@ fun NavGraphBuilder.authNavGraph(
             )
         }
 
-
-        appNavComposable<AuthScreens.StartScreen> {
-            StartScreen(
-                onFinished = {
-
-                }
-            )
-        }
     }
 }

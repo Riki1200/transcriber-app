@@ -41,6 +41,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import com.romeodev.core.Platform
+import com.romeodev.core.platform
 import com.romeodev.core.ui.layouts.loading.LoadingLayout
 import com.romeodev.core.utils.logging.Log
 import com.romeodev.features.auth.domain.enums.SignInMethod
@@ -102,7 +104,7 @@ fun SignInScreen(
             )
         },
 
-    )
+        )
 
     // Forget Password Dialog
     if (showForgetPasswordDialog) {
@@ -313,23 +315,26 @@ fun SignInScreenContent(
         )
 
 
-        AppleSignInButton(
-            isLoading = isAppleLoading,
-            setIsLoading = { isAppleLoading = it },
-            onFirebaseResult = {
-                try {
-                    Log.e(
-                        tag = null,
-                        "FIREBASE ${it.exceptionOrNull()}"
-                    )
+        if (platform == Platform.IOS) {
+            AppleSignInButton(
+                isLoading = isAppleLoading,
+                setIsLoading = { isAppleLoading = it },
+                onFirebaseResult = {
+                    try {
+                        Log.e(
+                            tag = null,
+                            "FIREBASE ${it.exceptionOrNull()}"
+                        )
 
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                    println("FIREBASE ${it.getOrNull()?.email}")
+                    onGoogleSignedIn(it.getOrNull(), SignInMethod.APPLE)
                 }
-                println("FIREBASE ${it.getOrNull()?.email}")
-                onGoogleSignedIn(it.getOrNull(), SignInMethod.GOOGLE)
-            }
-        )
+            )
+        }
+
 
         Spacer(modifier = Modifier.weight(1f))
 

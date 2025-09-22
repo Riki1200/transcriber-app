@@ -12,7 +12,20 @@
           "package_name": "com.romeodev.transcriberFast"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "558815437752-q979m2u4et444knpfajtmv6m8vogpvmr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.romeodev.transcriberFast",
+            "certificate_hash": "a30f5d414a29e9576e6bb2b6188c88a3af482e9f"
+          }
+        },
+        {
+          "client_id": "558815437752-4j0m4jc4tegei70bc1g06mgrsgb2bu3t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyA_lJwakDzyrD8wwqU2ISld9ZkyjYPdfZk"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "558815437752-4j0m4jc4tegei70bc1g06mgrsgb2bu3t.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "558815437752-rl4ue48amo4r4klnc5aq03h38n7ormgg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.romeodev.transcriberFast"
+              }
+            }
+          ]
         }
       }
     }

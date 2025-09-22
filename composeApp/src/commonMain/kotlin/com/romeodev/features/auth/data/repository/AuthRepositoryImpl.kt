@@ -7,6 +7,7 @@ import com.romeodev.core.utils.network_utils.RequestState
 import com.romeodev.features.auth.domain.models.UserData
 import com.romeodev.features.auth.domain.repository.AuthRepository
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.auth.ActionCodeSettings
 import dev.gitlive.firebase.auth.EmailAuthProvider
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
@@ -79,8 +80,12 @@ class AuthRepositoryImpl : AuthRepository {
 
     override suspend fun forgetPassword(email: String) = flow {
         emit(RequestState.Loading)
+
+
         try {
-            firebaseAuth.sendPasswordResetEmail(email = email)
+            firebaseAuth.sendPasswordResetEmail(
+                email = email
+            )
             emit(RequestState.Success(true))
         } catch (e: Exception) {
             e.printStackTrace()

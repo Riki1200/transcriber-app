@@ -272,6 +272,7 @@ android {
         getByName("debug") {
 
             val debugKeystore = file(System.getProperty("user.home") + "/.android/debug.keystore")
+            logger.warn("debug keystore: ${debugKeystore.absolutePath}")
             if (debugKeystore.exists()) {
                 storeFile = debugKeystore
                 storePassword = "android"
@@ -309,7 +310,7 @@ android {
             buildConfigField("String", "API_BASE_URL", "\"https://staging.example.com/\"")
             buildConfigField("boolean", "ENABLE_LOGS", "true")
 
-            signingConfig = signingConfigs.findByName("debug")
+            signingConfig = signingConfigs.findByName("release")
         }
 
         release {

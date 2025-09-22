@@ -24,15 +24,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.ElectricBolt
-import androidx.compose.material.icons.outlined.Light
 import androidx.compose.material.icons.outlined.RecordVoiceOver
-import androidx.compose.material.icons.outlined.Shield
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.StarOutline
-import androidx.compose.material.icons.outlined.VoiceChat
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -61,7 +55,6 @@ import com.slapps.cupertino.adaptive.AdaptiveButton
 import com.slapps.cupertino.adaptive.AdaptiveScaffold
 import com.slapps.cupertino.adaptive.ExperimentalAdaptiveApi
 import kotlinx.coroutines.delay
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -99,6 +92,7 @@ val onboardingPages = listOf(
         imageRes = Icons.Outlined.StarOutline,
         subtitle = Res.string.onboarding_features_subtitle,
         description = Res.string.onboarding_features_desc,
+        iconColor = Color.Yellow
     )
 )
 
@@ -106,8 +100,8 @@ val onboardingPages = listOf(
 @Composable
 @OptIn(ExperimentalAnimationApi::class, ExperimentalAdaptiveApi::class)
 fun StartScreen(
-    onFinished: () -> Unit = {},
     viewModel: AuthViewModel = koinInject(),
+    modifier: Modifier,
 ) {
     var currentPage by remember { mutableStateOf(0) }
     val progressList =
@@ -119,13 +113,11 @@ fun StartScreen(
             while (progressList[currentPage] < 1f) {
                 delay(60L)
                 progressList[currentPage] = (progressList[currentPage] + 0.01f).coerceAtMost(1f)
-                println("progressList: $progressList")
             }
             delay(2000L)
             currentPage++
         }
 
-        // Reinicio
         currentPage = 0
         progressList.fill(0f)
     }
@@ -135,7 +127,7 @@ fun StartScreen(
 
     AdaptiveScaffold {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(24.dp)
                 .windowInsetsPadding(WindowInsets.safeDrawing),
@@ -243,7 +235,7 @@ fun StartScreen(
 @Composable
 fun StartScreenPreview() {
     ScreenPreview() {
-        StartScreen()
+        StartScreen(modifier = Modifier)
     }
 
 }
