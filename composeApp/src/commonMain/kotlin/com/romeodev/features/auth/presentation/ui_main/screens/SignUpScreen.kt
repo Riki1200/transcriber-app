@@ -43,9 +43,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import com.romeodev.core.Platform
-import com.romeodev.core.platform
 import com.romeodev.core.ui.layouts.loading.LoadingLayout
+import com.romeodev.core.utils.platform.platformType
 import com.romeodev.features.auth.presentation.events.AuthEvents
 import com.romeodev.features.auth.presentation.ui_main.components.AppleSignInButton
 import com.romeodev.features.auth.presentation.ui_main.components.GoogleSignInButton
@@ -374,7 +373,7 @@ private fun SignUpScreenContent(
         )
 
 
-        if (platform == Platform.IOS) {
+        if (platformType.isIos) {
             AppleSignInButton(
                 isLoading = isAppleLoading,
                 setIsLoading = { isAppleLoading = it },
