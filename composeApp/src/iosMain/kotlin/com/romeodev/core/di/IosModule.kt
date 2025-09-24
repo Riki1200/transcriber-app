@@ -7,6 +7,9 @@ import org.koin.dsl.module
 
 val iosCoreModule = module {
 
+
+    single<Recorder> { IosRecorder() }
+
     single {
         val modelPath = bundledWhisperModelPath(name = "ggml-tiny", ext = "bin")
             ?: error("No se encontró el modelo en models/*.bin del bundle")
@@ -15,6 +18,5 @@ val iosCoreModule = module {
     }
 
 
-    single<Recorder> { IosRecorder() }
 }
 

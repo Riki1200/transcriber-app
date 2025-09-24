@@ -192,6 +192,7 @@ actual class WhisperEngine actual constructor(
             ?: error("No se encontró el modelo en el bundle (models/ggml-*.bin)")
 
             ctx = whisper_init_from_file_with_params(path, params)
+
             require(ctx != null) { "No se pudo cargar el modelo en iOS: $path" }
         }
     }
@@ -218,8 +219,8 @@ actual class WhisperEngine actual constructor(
             p.print_special = false
             p.translate = true
             p.detect_language = true
-            p.no_context = false
-            p.single_segment = false
+            p.no_context = true
+            p.single_segment = true
             p.no_timestamps = p.single_segment
             p.offset_ms = 0
 
@@ -526,9 +527,7 @@ actual class WhisperEngine actual constructor(
 
                 val start = TimeSource.Monotonic.markNow()
                 while (holderRef.get().isProcessing) {
-                    // Delay pequeño para no bloquear CPU
                     delay(10)
-                    // Timeout de seguridad (ej: 2 segundos)
                     if (start.elapsedNow() > 2.seconds) {
                         NSLog("stopImpl: timeout esperando a isProcessing=false")
                         break

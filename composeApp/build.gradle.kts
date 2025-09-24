@@ -9,10 +9,9 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.services)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.room)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.swift.klib)
+    id("io.realm.kotlin") version "3.0.0"
 }
 
 kotlin {
@@ -34,7 +33,6 @@ kotlin {
             freeCompilerArgs += listOf("-Xbinary=bundleId=com.romeodev.transcriberFast")
             // Required when using NativeSQLiteDriver
             linkerOpts.add("-lc++")
-            linkerOpts.add("-lsqlite3")
 
         }
 
@@ -97,7 +95,7 @@ kotlin {
 
             implementation(libs.androidx.media3.transformer)
             implementation(libs.androidx.media3.common)
-
+            compileOnly("io.realm.kotlin:library-base:3.0.0")
 
         }
         commonMain.dependencies {
@@ -149,9 +147,7 @@ kotlin {
             implementation(libs.stately.common)
             implementation(libs.atomic.fu)
 
-            // Database
-            implementation(libs.room.runtime)
-            implementation(libs.sqlite.bundled)
+
 
             // Logging
             api(libs.logging)
@@ -178,8 +174,8 @@ kotlin {
 
             implementation(libs.cupertino.adaptive)
             implementation(libs.cupertino.icons.extended)
+            implementation(libs.library.base)
 
-            implementation("io.realm.kotlin:gradle-plugin:3.0.0")
 
         }
         commonTest.dependencies {
@@ -343,16 +339,7 @@ android {
     }
 }
 dependencies {
-
     debugImplementation(compose.uiTooling)
 
-
-    add("kspAndroid", libs.room.compiler)
-    add("kspIosX64", libs.room.compiler)
-    add("kspIosArm64", libs.room.compiler)
-    add("kspIosSimulatorArm64", libs.room.compiler)
 }
 
-room {
-    schemaDirectory("$projectDir/schemas")
-}

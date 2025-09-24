@@ -1,8 +1,9 @@
 package com.romeodev.core
 
 object AppConstants {
-     val REVENUE_CAT_API_KEY = revCatApiKey
+    val REVENUE_CAT_API_KEY = revCatApiKey
     val GOOGLE_WEB_CLIENT_ID = googleAuthClientId
+    val DB_NAME = "transcribily.realm"
 }
 
 expect val revCatApiKey: String

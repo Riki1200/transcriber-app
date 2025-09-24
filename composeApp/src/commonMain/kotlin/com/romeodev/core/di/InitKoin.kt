@@ -18,8 +18,8 @@ fun initKoin(
         config?.invoke(this)
 
         modules(
+            coreModule,
             *platformModules.toTypedArray(),
-                    coreModule,
             authModule,
             /*Todo add modules here*/
             viewModels

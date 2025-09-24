@@ -1,18 +1,24 @@
 package com.romeodev.core.db.di
 
-import com.romeodev.core.db.KmpStarterDatabase
-import com.romeodev.core.db.getKmpDatabase
-import org.koin.core.module.Module
+
+import com.romeodev.core.AppConstants
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
 import org.koin.dsl.module
 
-expect val platformDatabaseModule: Module
 
 val databaseModule = module {
-    includes(platformDatabaseModule)
-    single<KmpStarterDatabase> {
-        getKmpDatabase(
-            databaseProvider = get()
-        )
-    }
+    val config = RealmConfiguration.Builder(
+        schema = setOf()
+    )
+        .name(AppConstants.DB_NAME)
+        .schemaVersion(1)
+        .deleteRealmIfMigrationNeeded()
+        .build()
+
+
+    val realm = Realm.open(config)
+
+    single { realm }
 }
 
