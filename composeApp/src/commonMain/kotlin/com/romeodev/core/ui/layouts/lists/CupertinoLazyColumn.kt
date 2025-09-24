@@ -27,8 +27,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.romeodev.core.ui.modifiers.customOverscroll
 import com.romeodev.core.ui.utils.providers.provideNullAndroidOverscrollConfiguration
-import com.romeodev.core.utils.platform.PlatformType
-import com.romeodev.core.utils.platform.platformType
+
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)

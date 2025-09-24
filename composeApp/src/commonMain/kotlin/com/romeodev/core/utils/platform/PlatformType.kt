@@ -2,7 +2,12 @@ package com.romeodev.core.utils.platform
 
 enum class PlatformType {
     IOS,
-    ANDROID
+    ANDROID;
+
+
+
+    val isIos: Boolean get() = this == IOS
+    val isAndroid: Boolean get() = this == ANDROID
 }
 
 

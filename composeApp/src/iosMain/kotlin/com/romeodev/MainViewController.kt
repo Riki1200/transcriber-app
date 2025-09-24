@@ -14,10 +14,7 @@ fun mainViewController() = ComposeUIViewController(
     configure = {
         AuthUtils.initGoogleAuthProvider()
         initKoin(
-            platformModules = listOf(
-                iosCoreModule,
-//                whisperModule(defaultLanguage = "en")
-            )
+            platformModules = listOf(iosCoreModule)
         )
         initRevenueCat()
     }

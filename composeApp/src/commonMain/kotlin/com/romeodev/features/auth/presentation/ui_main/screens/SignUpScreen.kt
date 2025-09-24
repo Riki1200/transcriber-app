@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
@@ -45,7 +46,6 @@ import androidx.compose.ui.text.style.TextAlign
 import com.romeodev.core.Platform
 import com.romeodev.core.platform
 import com.romeodev.core.ui.layouts.loading.LoadingLayout
-import com.romeodev.core.utils.logging.Log
 import com.romeodev.features.auth.presentation.events.AuthEvents
 import com.romeodev.features.auth.presentation.ui_main.components.AppleSignInButton
 import com.romeodev.features.auth.presentation.ui_main.components.GoogleSignInButton
@@ -107,6 +107,13 @@ fun SignUpScreen(
                     route = AuthScreens.SignIn
                 )
             )
+        },
+        onBack = {
+            viewModel.onEvent(
+                AuthEvents.Navigate(
+                    route = AuthScreens.SignIn
+                )
+            )
         }
     )
 
@@ -141,6 +148,7 @@ private fun SignUpScreenContent(
     onGoogleSignedIn: (FirebaseUser?) -> Unit,
     onSignUpClick: () -> Unit,
     onSignInClick: () -> Unit,
+    onBack: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
@@ -160,11 +168,23 @@ private fun SignUpScreenContent(
         Spacer(modifier = Modifier.height(Dimens.paddingExtraLarge))
 
         // Header
-        Text(
-            text = stringResource(Res.string.auth_create_account),
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.primary
-        )
+        Row() {
+            IconButton(onClick = {
+                onBack.invoke()
+            }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "back screen"
+                )
+            }
+
+            Text(
+                text = stringResource(Res.string.auth_create_account),
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
         Text(
             text = stringResource(Res.string.auth_sign_in_to_continue),
             style = MaterialTheme.typography.bodyLarge,
@@ -337,7 +357,6 @@ private fun SignUpScreenContent(
             HorizontalDivider(modifier = Modifier.weight(1f))
         }
 
-        // Google Sign In
         var isGoogleLoading by rememberSaveable {
             mutableStateOf(false)
         }
@@ -360,7 +379,7 @@ private fun SignUpScreenContent(
                 isLoading = isAppleLoading,
                 setIsLoading = { isAppleLoading = it },
                 onFirebaseResult = {
-                    onGoogleSignedIn(it.getOrNull(),)
+                    onGoogleSignedIn(it.getOrNull())
                 }
             )
         }

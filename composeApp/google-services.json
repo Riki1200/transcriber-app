@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "558815437752-du4tecqep4u7isfon586pio5041cg6ch.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.romeodev.transcriberFast",
+            "certificate_hash": "1eb0966efe67feeeaeac355851de85c1ef6bc7ce"
+          }
+        },
+        {
           "client_id": "558815437752-q979m2u4et444knpfajtmv6m8vogpvmr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

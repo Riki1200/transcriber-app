@@ -178,6 +178,9 @@ kotlin {
 
             implementation(libs.cupertino.adaptive)
             implementation(libs.cupertino.icons.extended)
+
+            implementation("io.realm.kotlin:gradle-plugin:3.0.0")
+
         }
         commonTest.dependencies {
             // Testing Framework

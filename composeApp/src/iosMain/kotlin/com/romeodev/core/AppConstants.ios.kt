@@ -6,3 +6,5 @@ actual val googleAuthClientId: String
     get() = "558815437752-rl4ue48amo4r4klnc5aq03h38n7ormgg.apps.googleusercontent.com"
 
 
+actual val revCatApiKey: String
+    get() = "appl_adVmvbXNaiCqhcyUrNELSfHWOaa"
