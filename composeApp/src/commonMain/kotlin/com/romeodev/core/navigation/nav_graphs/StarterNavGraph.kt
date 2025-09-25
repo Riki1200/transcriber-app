@@ -4,7 +4,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
 import com.romeodev.core.navigation.screens.StarterScreens
-import com.romeodev.core.navigation.screens.TranscriberScreens
+import com.romeodev.features.trancription.presentation.ui.navigation.TranscriberScreens
 import com.romeodev.core.purchases.presentation.ui_main.navigation.PurchasesScreens
 import com.romeodev.core.ui.composition_locals.LocalNavController
 import com.romeodev.core.ui.screens.WelcomeScreen

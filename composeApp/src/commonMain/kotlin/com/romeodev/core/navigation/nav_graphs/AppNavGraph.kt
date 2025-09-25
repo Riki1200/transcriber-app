@@ -4,6 +4,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import com.romeodev.core.purchases.presentation.ui_main.navigation.purchasesNavGraph
 import com.romeodev.features.auth.presentation.ui_main.navigation.authNavGraph
+import com.romeodev.features.trancription.presentation.ui.navigation.transcriberNavGraph
 
 fun NavGraphBuilder.appNavGraph(
     scaffoldModifier: Modifier,

@@ -40,4 +40,5 @@
     <string name="onboarding_features_subtitle">Everything you need</string>
     <string name="onboarding_features_desc">Speaker identification, word-level timestamps, multiple export formats, and more.</string>
 
+    <string name="monthly_usage">Monthly Usage</string>
 </resources>

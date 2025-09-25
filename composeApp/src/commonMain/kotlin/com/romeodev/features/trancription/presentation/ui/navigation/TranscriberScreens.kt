@@ -1,7 +1,6 @@
-package com.romeodev.core.navigation.screens
+package com.romeodev.features.trancription.presentation.ui.navigation
 
 import kotlinx.serialization.Serializable
-
 
 @Serializable
 sealed class TranscriberScreens {
@@ -11,4 +10,8 @@ sealed class TranscriberScreens {
 
     @Serializable
     data object MainScreen : TranscriberScreens()
+
+
+    @Serializable
+    data object TranscriberScreen : TranscriberScreens()
 }

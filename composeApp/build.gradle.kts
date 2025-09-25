@@ -11,7 +11,8 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.swift.klib)
-    id("io.realm.kotlin") version "3.0.0"
+    alias(libs.plugins.realm.kotlin)
+
 }
 
 kotlin {
@@ -95,7 +96,7 @@ kotlin {
 
             implementation(libs.androidx.media3.transformer)
             implementation(libs.androidx.media3.common)
-            compileOnly("io.realm.kotlin:library-base:3.0.0")
+
 
         }
         commonMain.dependencies {
@@ -174,7 +175,7 @@ kotlin {
 
             implementation(libs.cupertino.adaptive)
             implementation(libs.cupertino.icons.extended)
-            implementation(libs.library.base)
+            implementation(libs.realm.library.base)
 
 
         }

@@ -19,6 +19,8 @@ val databaseModule = module {
 
     val realm = Realm.open(config)
 
+    println("db name: ${realm.configuration.name}")
+
     single { realm }
 }
 

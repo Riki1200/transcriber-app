@@ -182,6 +182,7 @@ actual class WhisperEngine actual constructor(
             if (UIDevice.currentDevice.model.contains("Simulator")) {
                 params.ptr.pointed.use_gpu = false
                 params.ptr.pointed.flash_attn = false
+
             } else {
                 params.ptr.pointed.use_gpu = true
                 params.ptr.pointed.flash_attn = true

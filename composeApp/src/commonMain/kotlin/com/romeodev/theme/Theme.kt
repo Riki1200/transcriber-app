@@ -28,7 +28,9 @@ import androidx.compose.material3.lightColorScheme as m3LightColorScheme
 import com.slapps.cupertino.theme.darkColorScheme as cupertinoDarkColorScheme
 import com.slapps.cupertino.theme.lightColorScheme as cupertinoLightColorScheme
 
-val lightScheme = lightColorScheme(
+
+
+val lightScheme = m3LightColorScheme(
     primary = primaryLight,
     onPrimary = onPrimaryLight,
     primaryContainer = primaryContainerLight,
@@ -66,7 +68,7 @@ val lightScheme = lightColorScheme(
     surfaceContainerHighest = surfaceContainerHighestLight,
 )
 
-val darkScheme = darkColorScheme(
+val darkScheme = m3DarkColorScheme(
     primary = primaryDark,
     onPrimary = onPrimaryDark,
     primaryContainer = primaryContainerDark,
@@ -97,78 +99,138 @@ val darkScheme = darkColorScheme(
     inversePrimary = inversePrimaryDark,
     surfaceDim = surfaceDimDark,
     surfaceBright = surfaceBrightDark,
-    surfaceContainerLowest = surfaceContainerLowestDark,
-    surfaceContainerLow = surfaceContainerLowDark,
-    surfaceContainer = surfaceContainerDark,
-    surfaceContainerHigh = surfaceContainerHighDark,
-    surfaceContainerHighest = surfaceContainerHighestDark,
+    surfaceContainerLowest = Color(0xFF0F0D11),
+    surfaceContainerLow = Color(0xFF1C1B1F),
+    surfaceContainer = Color(0xFF201F23),
+    surfaceContainerHigh = Color(0xFF2B2A2E),
+    surfaceContainerHighest = Color(0xFF363438),
+    surfaceTint =  Color(0xFF363438),
 )
 
+// Definición de colores de Material para la app
+val appLightPrimary = Color(0xFFADD8E6)
+val appLightSecondary = Color(0xFFB2DFDB)
+val appLightBackground = Color(0xFFFFFBFE)
+val appLightSurface = Color(0xFFF2F2F7)
+val appLightOnPrimary = Color(0xFF1E1E1E)
+val appLightOnSecondary = Color(0xFF1E1E1E)
+val appLightOnBackground = Color(0xFF1C1B1F)
+val appLightOnSurface = Color(0xFF1C1B1F)
+
+val appDarkPrimary = Color(0xFF87BFFF)
+val appDarkSecondary = Color(0xFF80CBC4)
+val appDarkBackground = Color(0xFF121212)
+val appDarkSurface = Color(0xFF1E1E1E)
+val appDarkOnPrimary = Color(0xFFEFEFEF)
+val appDarkOnSecondary = Color(0xFFE0E0E0)
+val appDarkOnBackground = Color(0xFFE6E1E5)
+val appDarkOnSurface = Color(0xFFE6E1E5)
 
 val AppLightMaterialScheme = m3LightColorScheme(
-    primary = Color(0xFFADD8E6),
-    secondary = Color(0xFFB2DFDB),
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFF2F2F7),
-    onPrimary = Color(0xFF1E1E1E),
-    onSecondary = Color(0xFF1E1E1E),
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F)
+    primary = appLightPrimary,
+    secondary = appLightSecondary,
+    background = appLightBackground,
+    surface = appLightSurface,
+    onPrimary = appLightOnPrimary,
+    onSecondary = appLightOnSecondary,
+    onBackground = appLightOnBackground,
+    onSurface = appLightOnSurface
 )
 
 val AppDarkMaterialScheme = m3DarkColorScheme(
-    primary = Color(0xFF87BFFF),
-    secondary = Color(0xFF80CBC4),
-    background = Color(0xFF121212),
-    surface = Color(0xFF1E1E1E),
-    onPrimary = Color(0xFFEFEFEF),
-    onSecondary = Color(0xFFE0E0E0),
-    onBackground = Color(0xFFE6E1E5),
-    onSurface = Color(0xFFE6E1E5)
+    primary = appDarkPrimary,
+    secondary = appDarkSecondary,
+    background = appDarkBackground,
+    surface = appDarkSurface,
+    onPrimary = appDarkOnPrimary,
+    onSecondary = appDarkOnSecondary,
+    onBackground = appDarkOnBackground,
+    onSurface = appDarkOnSurface
 )
+
+// Definición de colores de Cupertino para la app
+val cupertinoLightAccent = Color(0xFFADD8E6)
+val cupertinoLightLabel = Color(0xFF2D2D2D)
+val cupertinoLightSecondaryLabel = Color(0xFF6D6D6D)
+val cupertinoLightTertiaryLabel = Color(0xFFA0A0A0)
+val cupertinoLightQuaternaryLabel = Color(0xFFC0C0C0)
+val cupertinoLightSystemFill = Color(0xFFD0F0FD)
+val cupertinoLightSecondarySystemFill = Color(0xFFFDE2E4)
+val cupertinoLightTertiarySystemFill = Color(0xFFFFF5E5)
+val cupertinoLightQuaternarySystemFill = Color(0xFFE5F4EA)
+val cupertinoLightPlaceholderText = Color(0xFFB0B0B0)
+val cupertinoLightSeparator = Color(0xFFE0E0E0)
+val cupertinoLightOpaqueSeparator = Color(0xFFCCCCCC)
+val cupertinoLightLink = Color(0xFF9D9DED)
+val cupertinoLightSystemGroupedBackground = Color(0xFFF7F7FA)
+val cupertinoLightSecondarySystemGroupedBackground = Color(0xFFF2F2F5)
+val cupertinoLightTertiarySystemGroupedBackground = Color(0xFFEBEBF0)
+val cupertinoLightSystemBackground = Color(0xFFFFFFFF)
+val cupertinoLightSecondarySystemBackground = Color(0xFFF9F9F9)
+val cupertinoLightTertiarySystemBackground = Color(0xFFF2F2F2)
+
+val cupertinoDarkAccent = Color(0xFF87BFFF)
+val cupertinoDarkLabel = Color(0xFFEDEDED)
+val cupertinoDarkSecondaryLabel = Color(0xFFBBBBBB)
+val cupertinoDarkTertiaryLabel = Color(0xFF999999)
+val cupertinoDarkQuaternaryLabel = Color(0xFF777777)
+val cupertinoDarkSystemFill = Color(0xFF1E3A50)
+val cupertinoDarkSecondarySystemFill = Color(0xFF4E3A50)
+val cupertinoDarkTertiarySystemFill = Color(0xFF5A3E2B)
+val cupertinoDarkQuaternarySystemFill = Color(0xFF3B4E41)
+val cupertinoDarkPlaceholderText = Color(0xFF888888)
+val cupertinoDarkSeparator = Color(0xFF444444)
+val cupertinoDarkOpaqueSeparator = Color(0xFF333333)
+val cupertinoDarkLink = Color(0xFFB0A7F3)
+val cupertinoDarkSystemGroupedBackground = Color(0xFF121212)
+val cupertinoDarkSecondarySystemGroupedBackground = Color(0xFF1C1C1E)
+val cupertinoDarkTertiarySystemGroupedBackground = Color(0xFF2A2A2E)
+val cupertinoDarkSystemBackground = Color(0xFF000000)
+val cupertinoDarkSecondarySystemBackground = Color(0xFF111111)
+val cupertinoDarkTertiarySystemBackground = Color(0xFF1A1A1A)
 
 
 val AppLightCupertinoScheme = cupertinoLightColorScheme(
-    accent = Color(0xFFADD8E6),
-    label = Color(0xFF2D2D2D),
-    secondaryLabel = Color(0xFF6D6D6D),
-    tertiaryLabel = Color(0xFFA0A0A0),
-    quaternaryLabel = Color(0xFFC0C0C0),
-    systemFill = Color(0xFFD0F0FD),
-    secondarySystemFill = Color(0xFFFDE2E4),
-    tertiarySystemFill = Color(0xFFFFF5E5),
-    quaternarySystemFill = Color(0xFFE5F4EA),
-    placeholderText = Color(0xFFB0B0B0),
-    separator = Color(0xFFE0E0E0),
-    opaqueSeparator = Color(0xFFCCCCCC),
-    link = Color(0xFF9D9DED),
-    systemGroupedBackground = Color(0xFFF7F7FA),
-    secondarySystemGroupedBackground = Color(0xFFF2F2F5),
-    tertiarySystemGroupedBackground = Color(0xFFEBEBF0),
-    systemBackground = Color(0xFFFFFFFF),
-    secondarySystemBackground = Color(0xFFF9F9F9),
-    tertiarySystemBackground = Color(0xFFF2F2F2),
+    accent = cupertinoLightAccent,
+    label = cupertinoLightLabel,
+    secondaryLabel = cupertinoLightSecondaryLabel,
+    tertiaryLabel = cupertinoLightTertiaryLabel,
+    quaternaryLabel = cupertinoLightQuaternaryLabel,
+    systemFill = cupertinoLightSystemFill,
+    secondarySystemFill = cupertinoLightSecondarySystemFill,
+    tertiarySystemFill = cupertinoLightTertiarySystemFill,
+    quaternarySystemFill = cupertinoLightQuaternarySystemFill,
+    placeholderText = cupertinoLightPlaceholderText,
+    separator = cupertinoLightSeparator,
+    opaqueSeparator = cupertinoLightOpaqueSeparator,
+    link = cupertinoLightLink,
+    systemGroupedBackground = cupertinoLightSystemGroupedBackground,
+    secondarySystemGroupedBackground = cupertinoLightSecondarySystemGroupedBackground,
+    tertiarySystemGroupedBackground = cupertinoLightTertiarySystemGroupedBackground,
+    systemBackground = cupertinoLightSystemBackground,
+    secondarySystemBackground = cupertinoLightSecondarySystemBackground,
+    tertiarySystemBackground = cupertinoLightTertiarySystemBackground,
 )
 val AppDarkCupertinoScheme = cupertinoDarkColorScheme(
-    accent = Color(0xFF87BFFF),
-    label = Color(0xFFEDEDED),
-    secondaryLabel = Color(0xFFBBBBBB),
-    tertiaryLabel = Color(0xFF999999),
-    quaternaryLabel = Color(0xFF777777),
-    systemFill = Color(0xFF1E3A50),
-    secondarySystemFill = Color(0xFF4E3A50),
-    tertiarySystemFill = Color(0xFF5A3E2B),
-    quaternarySystemFill = Color(0xFF3B4E41),
-    placeholderText = Color(0xFF888888),
-    separator = Color(0xFF444444),
-    opaqueSeparator = Color(0xFF333333),
-    link = Color(0xFFB0A7F3),
-    systemGroupedBackground = Color(0xFF121212),
-    secondarySystemGroupedBackground = Color(0xFF1C1C1E),
-    tertiarySystemGroupedBackground = Color(0xFF2A2A2E),
-    systemBackground = Color(0xFF000000),
-    secondarySystemBackground = Color(0xFF111111),
-    tertiarySystemBackground = Color(0xFF1A1A1A),
+    accent = cupertinoDarkAccent,
+    label = cupertinoDarkLabel,
+    secondaryLabel = cupertinoDarkSecondaryLabel,
+    tertiaryLabel = cupertinoDarkTertiaryLabel,
+    quaternaryLabel = cupertinoDarkQuaternaryLabel,
+    systemFill = cupertinoDarkSystemFill,
+    secondarySystemFill = cupertinoDarkSecondarySystemFill,
+    tertiarySystemFill = cupertinoDarkTertiarySystemFill,
+    quaternarySystemFill = cupertinoDarkQuaternarySystemFill,
+    placeholderText = cupertinoDarkPlaceholderText,
+    separator = cupertinoDarkSeparator,
+    opaqueSeparator = cupertinoDarkOpaqueSeparator,
+    link = cupertinoDarkLink,
+    systemGroupedBackground = cupertinoDarkSystemGroupedBackground,
+    secondarySystemGroupedBackground = cupertinoDarkSecondarySystemGroupedBackground,
+    tertiarySystemGroupedBackground = cupertinoDarkTertiarySystemGroupedBackground,
+    systemBackground = cupertinoDarkSystemBackground,
+    secondarySystemBackground = cupertinoDarkSecondarySystemBackground,
+    tertiarySystemBackground = cupertinoDarkTertiarySystemBackground,
 )
 
 @Immutable

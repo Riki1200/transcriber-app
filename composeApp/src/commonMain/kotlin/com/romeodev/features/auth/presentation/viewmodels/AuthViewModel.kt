@@ -10,6 +10,8 @@ import com.romeodev.features.auth.domain.models.UserData
 import com.romeodev.features.auth.domain.repository.AuthRepository
 import com.romeodev.features.auth.presentation.events.AuthEvents
 import com.romeodev.features.auth.presentation.states.AuthState
+import com.romeodev.features.auth.presentation.ui_main.navigation.AuthScreens
+import com.romeodev.features.trancription.presentation.ui.navigation.TranscriberScreens
 import dev.gitlive.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -135,6 +137,14 @@ class AuthViewModel(
                     popUpTo = AuthScreens.Root,
                     inclusive = true
                 )*/
+
+                navigator.navigateTo(
+                    route = TranscriberScreens.MainScreen,
+                    popUpTo = AuthScreens.Root,
+                    inclusive = true,
+                )
+
+
                 _state.update {
                     it.copy(
                         isLoading = false
@@ -162,6 +172,13 @@ class AuthViewModel(
                     popUpTo = AuthScreens.Root,
                     inclusive = true
                 )*/
+
+                navigator.navigateTo(
+                    route = TranscriberScreens.MainScreen,
+                    popUpTo = AuthScreens.Root,
+                    inclusive = true,
+                )
+
                 _state.update {
                     it.copy(
                         isLoading = false
@@ -326,12 +343,12 @@ class AuthViewModel(
 
                         is RequestState.Success ->
                             _state.update {
-                                /* Todo Navigate to main app screen here
-                                    navigator.navigateTo(
-                                    route = GeneratorScreens.Root,
+                                //Todo Navigate to main app screen here
+                                navigator.navigateTo(
+                                    route = TranscriberScreens.MainScreen,
                                     popUpTo = AuthScreens.Root,
                                     inclusive = true,
-                                )*/
+                                )
                                 SnackbarController.sendAlert(null)
                                 it.copy(
                                     isLoading = false,

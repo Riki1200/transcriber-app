@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.romeodev.core.ui.modifiers.customOverscroll
 import com.romeodev.core.ui.utils.providers.provideNullAndroidOverscrollConfiguration
+import com.romeodev.core.utils.platform.platformType
 
 import kotlin.math.roundToInt
 
@@ -55,7 +56,7 @@ fun CupertinoLazyColumn(
             modifier =
             Modifier
                 .then(
-                    if (platformType == PlatformType.ANDROID)
+                    if (platformType.isAndroid)
                         Modifier
                             .customOverscroll(
                                 state,
@@ -78,7 +79,7 @@ fun CupertinoLazyColumn(
                         },
                     )
                     .then(
-                        if (platformType == PlatformType.ANDROID) {
+                        if (platformType.isAndroid) {
                             val value = try {
                                 animatedOverscrollAmount.roundToInt()
                             } catch (e: Exception) {
